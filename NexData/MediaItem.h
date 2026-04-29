@@ -3,6 +3,7 @@
 
 using namespace std;
 
+//EL PRIMER CAMBIO WAZA
 class MediaItem {
 public:
 	string title;
