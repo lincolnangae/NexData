@@ -3,7 +3,7 @@
 
 using namespace std;
 
-class MediaItem {
+class Pelicula {
 public:
 	string title;
 	int year;
