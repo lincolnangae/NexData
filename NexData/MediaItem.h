@@ -9,5 +9,7 @@ public:
 	int year;
 	double puntuacion;
 	string genero;
+	string nosesabe, prueba;
+
 private:
 };
