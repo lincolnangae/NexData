@@ -1,7 +1,6 @@
 #pragma once
 #include"Dependencias.h" //.h donde guardar dependencias
 
-
 template<typename S, typename I, typename D> //String, INT y  DOUBLE
 class Pelicula
 {
@@ -16,7 +15,7 @@ public:
 	S title, genero;
 	I year;
 	D puntuacion;
-	Pelicula* next, prepvious;
+	Pelicula<S, I, D>* next,* previous;
 
 };
 
@@ -42,5 +41,5 @@ public:
 	}
 
 private:
-	Pelicula<S, I, D>* head, tail;
+	Pelicula<S, I, D>* head,* tail;
 };
