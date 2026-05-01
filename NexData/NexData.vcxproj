@@ -126,6 +126,8 @@
     <ResourceCompile Include="app.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Dependencias.h" />
+    <ClInclude Include="Header.h" />
     <ClInclude Include="MediaItem.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
