@@ -39,6 +39,61 @@ public:
 			tail->next = head;
 		}
 	}
+	vector<Pelicula<S, I, D>*> OrdenarCalificacion() {
+		vector<Pelicula<S, I, D>*> vectorAux;
+		Pelicula<S, I, D>* curr = head;
+		do {
+			vectorAux.push_back(curr);
+			curr = curr->next;
+		} while (curr != head);
+
+		for (int i = 0; i < vectorAux.size(); i++) {
+			for (int j = 0; j < vectorAux.size() - 1; j++) {
+				if (vectorAux[j]->puntuacion <= vectorAux[j + 1]->puntuacion) {
+					swap(vectorAux[j], vectorAux[j + 1]);
+				}
+			}
+		}
+
+		return vectorAux;
+	}
+	vector<Pelicula<S, I, D>*> OrdenarAlfabeticamente() {
+		vector<Pelicula<S, I, D>*> vectorAux;
+		Pelicula<S, I, D>* curr = head;
+		do {
+			vectorAux.push_back(curr);
+			curr = curr->next;
+		} while (curr != head);
+		for (int i = 0; i < vectorAux.size(); i++) {
+			for (int j = 0; j < vectorAux.size() - 1; j++) {
+				char letraJ = vectorAux[j]->title[0], letraJ1 = vectorAux[j+1]->title[0];
+				if (int(letraJ) - 65 >= int(letraJ1) - 65) {
+					swap(vectorAux[j], vectorAux[j+1]);
+				}
+			}
+		}
+
+
+		return vectorAux;
+	}
+	vector<Pelicula<S, I, D>*> OrdenarPorAnio() {
+		vector<Pelicula<S, I, D>*> vectorAux;
+		Pelicula<S, I, D>* curr = head;
+		do {
+			vectorAux.push_back(curr);
+			curr = curr->next;
+		} while (curr != head);
+
+		for (int i = 0; i < vectorAux.size(); i++) {
+			for (int j = 0; j < vectorAux.size() - 1; j++) {
+				if (vectorAux[j]->year <= vectorAux[j + 1]->year) {
+					swap(vectorAux[j], vectorAux[j + 1]);
+				}
+			}
+		}
+
+		return vectorAux;
+	}
 
 private:
 	Pelicula<S, I, D>* head,* tail;
