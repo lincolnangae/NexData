@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include"conio.h"
 #include <msclr/marshal_cppstd.h>
 #include<vector>
 using namespace System;
