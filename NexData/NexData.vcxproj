@@ -126,10 +126,15 @@
     <ResourceCompile Include="app.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Complementos.h" />
     <ClInclude Include="Dependencias.h" />
+    <ClInclude Include="GestionadorCatálogo.h" />
     <ClInclude Include="Header.h" />
-    <ClInclude Include="MediaItem.h" />
+    <ClInclude Include="ListaDobleCircular.h" />
+    <ClInclude Include="ListaSimple.h" />
+    <ClInclude Include="Nodo.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Pelicula.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>

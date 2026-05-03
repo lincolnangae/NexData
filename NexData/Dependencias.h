@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <string>
 #include"conio.h"
 #include <msclr/marshal_cppstd.h>
 #include<vector>
