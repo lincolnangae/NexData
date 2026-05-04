@@ -15,6 +15,10 @@ void EjecutarMenu(Gestionador& sistema) {
         cout << "             NEXT --- DATA              " << endl;
         cout << "========================================" << endl;
 
+        Console::ForegroundColor = ConsoleColor::Cyan;
+        cout << "\n----------------------------------------" << endl;
+        cout << "ORDENAR POR: [C]alificacion | [N] Anio | [A]lfa" << endl;
+
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ LO MAS VISTO ]\n" << endl;
         Console::ForegroundColor = ConsoleColor::White;
@@ -25,9 +29,6 @@ void EjecutarMenu(Gestionador& sistema) {
         Console::ForegroundColor = ConsoleColor::White;
         sistema.mostrarRecientes();
 
-        Console::ForegroundColor = ConsoleColor::Cyan;
-        cout << "\n----------------------------------------" << endl;
-        cout << "ORDENAR POR: [C]alificacion | [N] Anio | [A]lfa" << endl;
         Console::ForegroundColor = ConsoleColor::White;
         cout << "Presione (1-6) para ver detalle o 0 para Salir: ";
 
@@ -44,7 +45,8 @@ void EjecutarMenu(Gestionador& sistema) {
             cout << "\n(Proximamente: Se mostrara la informacion extendida de la posicion " << opcionNum << ")" << endl;
 
             cout << "\nPresione cualquier tecla para volver al menu...";
-            _getch();
+
+            tecla = _getch();
         }
 
         else if (tecla == 'c' || tecla == 'C') {
