@@ -17,7 +17,7 @@ void EjecutarMenu(Gestionador& sistema) {
 
         Console::ForegroundColor = ConsoleColor::Cyan;
         cout << "\n----------------------------------------" << endl;
-        cout << "ORDENAR POR: [C]alificacion | [N] Anio | [A]lfa" << endl;
+        cout << "ORDENAR POR: [C]alificacion | [L]anzamiento | [A]lfabetico" << endl;
 
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ LO MAS VISTO ]\n" << endl;
@@ -25,7 +25,7 @@ void EjecutarMenu(Gestionador& sistema) {
         sistema.MostrarTops(TipoTop::MASVISTAS);
 
         Console::ForegroundColor = ConsoleColor::Yellow;
-        cout << "\n[ RECIENTES ]\n" << endl;
+        cout << "\n[ RECIENTEMENTE AGREGADOS ]\n" << endl;
         Console::ForegroundColor = ConsoleColor::White;
         sistema.MostrarTops(TipoTop::RECIENTES);
 
