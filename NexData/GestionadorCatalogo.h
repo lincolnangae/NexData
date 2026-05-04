@@ -5,6 +5,7 @@
 #include "Pelicula.h"
 
 //Clase principal que controla el flujo de datos
+enum class TipoTop { RECIENTES, MASVISTAS };
 class Gestionador {
 private:
 
@@ -137,25 +138,23 @@ public:
         }
     }
 
-    void MostrarTopVistas() {
-        Nodo<Pelicula<double>>* actual = topMasVistos.getCabeza();
-            int indice = 1;
+    void MostrarTops(TipoTop tipo) {
+        Nodo<Pelicula<double>>* actual = nullptr;
+        int indice = 0;
+
+        if (tipo == TipoTop::MASVISTAS) {
+            actual = topMasVistos.getCabeza();
+                indice = 1;
+        }
+        else {
+            actual = topRecientes.getCabeza();
+                indice = 4;
+        }
+
         while (actual != nullptr) {
             cout << indice << ". ";
             actual->dato.MostrarEnLista();
                 actual = actual->siguiente;
-            indice++;
-            cout << endl;
-        }
-    }
-
-    void mostrarRecientes() {
-        Nodo<Pelicula<double>>* actual = topRecientes.getCabeza();
-            int indice = 4;
-        while (actual != nullptr) {
-            cout << indice << ". ";
-            actual->dato.MostrarEnLista();
-            actual = actual->siguiente;
             indice++;
             cout << endl;
         }

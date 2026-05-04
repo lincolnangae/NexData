@@ -22,12 +22,12 @@ void EjecutarMenu(Gestionador& sistema) {
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ LO MAS VISTO ]\n" << endl;
         Console::ForegroundColor = ConsoleColor::White;
-        sistema.MostrarTopVistas();
+        sistema.MostrarTops(TipoTop::MASVISTAS);
 
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ RECIENTES ]\n" << endl;
         Console::ForegroundColor = ConsoleColor::White;
-        sistema.mostrarRecientes();
+        sistema.MostrarTops(TipoTop::RECIENTES);
 
         Console::ForegroundColor = ConsoleColor::White;
         cout << "Presione (1-6) para ver detalle o 0 para Salir: ";
