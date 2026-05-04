@@ -100,7 +100,7 @@ public:
         }
     }
 
-    void guardarDatos() {
+    void GuardarDatos() {
         String^ rutaDatos = "DirectorioDatos.txt";
 
         StreamWriter^ escritor = gcnew StreamWriter(rutaDatos);
@@ -137,7 +137,7 @@ public:
         }
     }
 
-    void mostrarTopVistas() {
+    void MostrarTopVistas() {
         Nodo<Pelicula<double>>* actual = topMasVistos.getCabeza();
             int indice = 1;
         while (actual != nullptr) {

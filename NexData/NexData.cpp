@@ -1,15 +1,15 @@
-#include"pch.h"
+#include "pch.h"
 #include <iostream>
+#include <conio.h>
 using namespace std;
-
 #include "GestionadorCatalogo.h"
 
-//Referencia para no sobreescribir datos
 void EjecutarMenu(Gestionador& sistema) {
-    int opcion = -1;
+    char tecla = ' ';
 
-    while (opcion != 0) {
+    while (tecla != '0') {
         system("cls");
+
         Console::ForegroundColor = ConsoleColor::Green;
         cout << "========================================" << endl;
         cout << "             NEXT --- DATA              " << endl;
@@ -18,37 +18,60 @@ void EjecutarMenu(Gestionador& sistema) {
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ LO MAS VISTO ]\n" << endl;
         Console::ForegroundColor = ConsoleColor::White;
-        sistema.mostrarTopVistas();
+        sistema.MostrarTopVistas();
+
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ RECIENTES ]\n" << endl;
         Console::ForegroundColor = ConsoleColor::White;
         sistema.mostrarRecientes();
 
+        Console::ForegroundColor = ConsoleColor::Cyan;
         cout << "\n----------------------------------------" << endl;
-        cout << "0. Salir | Seleccione (1-6) para ver detalle: ";
+        cout << "ORDENAR POR: [C]alificacion | [N] Anio | [A]lfa" << endl;
+        Console::ForegroundColor = ConsoleColor::White;
+        cout << "Presione (1-6) para ver detalle o 0 para Salir: ";
 
-        if (!(cin >> opcion)) {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            continue;
+        // Captura instantánea de tecla
+        tecla = _getch();
+
+        if (tecla == '0') break;
+
+        if (tecla >= '1' && tecla <= '6') {
+            system("cls");
+            int opcionNum = tecla - '0';
+            cout << ">>> DETALLE DE PELICULA SELECCIONADA [" << opcionNum << "] <<<" << endl;
+
+            cout << "\n(Proximamente: Se mostrara la informacion extendida de la posicion " << opcionNum << ")" << endl;
+
+            cout << "\nPresione cualquier tecla para volver al menu...";
+            _getch();
         }
 
-        if (opcion >= 1 && opcion <= 6) {
+        else if (tecla == 'c' || tecla == 'C') {
             system("cls");
-            cout << "Cargando detalle de la pelicula " << opcion << "..." << endl;
+            cout << "[ FILTRANDO POR CALIFICACION... ]" << endl;
+            system("pause");
+        }
+        else if (tecla == 'n' || tecla == 'N') {
+            system("cls");
+            cout << "[ FILTRANDO POR ANIO DE LANZAMIENTO... ]" << endl;
+            system("pause");
+        }
+        else if (tecla == 'a' || tecla == 'A') {
+            system("cls");
+            cout << "[ FILTRANDO ALFABETICAMENTE... ]" << endl;
             system("pause");
         }
     }
 }
 
-int main()
-{
+int main() {
     Gestionador miSistema;
     miSistema.cargarDesdeArchivos();
 
     EjecutarMenu(miSistema);
 
-    miSistema.guardarDatos();
+    miSistema.GuardarDatos();
 
     return 0;
 }
