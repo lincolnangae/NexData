@@ -4,6 +4,7 @@ using namespace std;
 
 #include "GestionadorCatalogo.h"
 
+//Referencia para no sobreescribir datos
 void EjecutarMenu(Gestionador& sistema) {
     int opcion = -1;
 
