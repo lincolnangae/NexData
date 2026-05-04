@@ -26,13 +26,28 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MediaItem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Header.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dependencias.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Complementos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GestionadorCatalogo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ListaDobleCircular.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ListaSimple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Nodo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pelicula.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
