@@ -32,7 +32,7 @@ void EjecutarMenu(Gestionador& sistema) {
         Console::ForegroundColor = ConsoleColor::White;
         cout << "Presione (1-6) para ver detalle o 0 para Salir: ";
 
-        // Captura instantánea de tecla
+        //Capturador de tecla
         tecla = _getch();
 
         if (tecla == '0') break;

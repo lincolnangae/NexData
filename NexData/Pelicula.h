@@ -24,7 +24,7 @@ public:
     }
 
     void MostrarEnLista() {
-        // Lambda para reemplazar '-' por espacios
+        // Lambda para reemplazar el signo - por espacios
         auto limpiarTexto = [](string texto) {
             for (char& c : texto) {
                 if (c == '-') c = ' ';
@@ -42,7 +42,7 @@ public:
     }
 
     void MostrarEnCatalogo(int x, int y) {
-        // Lambda para reemplazar '-' por espacios
+        // Lambda para reemplazar el signo - por espacios
         auto limpiarTexto = [](string texto) {
             for (char& c : texto) {
                 if (c == '-') c = ' ';
