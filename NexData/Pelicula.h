@@ -16,12 +16,25 @@ public:
     int Volumen;
     int VistasTotales;
 
-    Pelicula(int ord, const string& title, int year, const vector<string>& cat, T_Format punt, int vol, int visits)
-        : Orden(ord), Titulo(title), Lanzamiento(year), Categorias(cat), Puntuacion(punt), Volumen(vol), VistasTotales(visits) {
+    Pelicula(int ord = 0, const string& title = "Sin Titulo", int year = 0,
+        const vector<string>& cat = vector<string>(), T_Format punt = 0,
+        int vol = 0, int visits = 0)
+        : Orden(ord), Titulo(title), Lanzamiento(year), Categorias(cat),
+        Puntuacion(punt), Volumen(vol), VistasTotales(visits) {
     }
 
     void MostrarEnLista() {
-        cout << "[" << Orden << "] " << Titulo << " (" << Lanzamiento << ")" << endl;
+        // Lambda para reemplazar '-' por espacios
+        auto limpiarTexto = [](string texto) {
+            for (char& c : texto) {
+                if (c == '-') c = ' ';
+            }
+            return texto;
+            };
+
+        string tituloLimpio = limpiarTexto(Titulo);
+
+        cout << "[" << Orden << "] " << tituloLimpio << " (" << Lanzamiento << ")" << endl;
         cout << "Rating: " << Puntuacion << " | Vistas: " << VistasTotales << endl;
         cout << "Generos: ";
         for (const auto& c : Categorias) cout << c << " ";

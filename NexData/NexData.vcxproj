@@ -128,7 +128,7 @@
   <ItemGroup>
     <ClInclude Include="Complementos.h" />
     <ClInclude Include="Dependencias.h" />
-    <ClInclude Include="GestionadorCatálogo.h" />
+    <ClInclude Include="GestionadorCatalogo.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="ListaDobleCircular.h" />
     <ClInclude Include="ListaSimple.h" />

@@ -10,8 +10,30 @@ private:
 
     ListaCircularDoble<Pelicula<double>> catalogo;
     vector<Pelicula<double>> datosModificables; //Lista para actualizar "DirectorioDatos.txt"
+    ListaSimple<Pelicula<double>> topMasVistos; //Los Mas Vistos
+    ListaSimple<Pelicula<double>> topRecientes; //Los ultimos de la lista
 
+    //Vistas Referenciales
+    Pelicula<double> Top1;
+    Pelicula<double> Top2;
+    Pelicula<double> Top3;
+
+
+    int TopVistas1;
+    int TopVistas2;
+    int TopVistas3;
+ 
 public:
+
+    Gestionador() {
+        TopVistas1 = 0;
+        TopVistas2 = 0;
+        TopVistas3 = 0;
+    }
+
+    ~Gestionador() {
+        datosModificables.clear();
+    }
 
     void cargarDesdeArchivos() {
         //Nombre de Ruta
@@ -20,6 +42,7 @@ public:
 
         //Verificacion de existencia
         if (File::Exists(rutaPelis) && File::Exists(rutaDatos)) {
+            cout << "dentro";
             StreamReader^ lectorPelis = gcnew StreamReader(rutaPelis);
             StreamReader^ lectorDatos = gcnew StreamReader(rutaDatos);
 
@@ -53,14 +76,24 @@ public:
                     //Crear objeto pelicula
                     Pelicula<double> nuevaPeli(orden, titulo, lanzamiento, categorias, rating, volumen, vistas);
 
+                    ActualizarTopVistas(nuevaPeli);
+
                     catalogo.InsertarAlFinal(nuevaPeli);
                     datosModificables.push_back(nuevaPeli);
+                    topRecientes.InsertarAlInicio(nuevaPeli);
                 }
             }
             catch (Exception^ ex) {
                 cout << "Error critico al procesar los datos: " << marshal_as<string>(ex->Message) << endl;
             }
             finally {
+
+                if (TopVistas1 > 0) {
+                    topMasVistos.InsertarAlInicio(Top3);
+                    topMasVistos.InsertarAlInicio(Top2);
+                    topMasVistos.InsertarAlInicio(Top1);
+                }
+
                 lectorPelis->Close();
                 lectorDatos->Close();
             }
@@ -88,4 +121,44 @@ public:
             escritor->Close();
         }
     }
+
+    void ActualizarTopVistas(Pelicula<double> p) {
+        if (p.VistasTotales > TopVistas1) {
+            Top3 = Top2; TopVistas3 = TopVistas2;
+            Top2 = Top1; TopVistas2 = TopVistas1;
+            Top1 = p; TopVistas1 = p.VistasTotales;
+        }
+        else if (p.VistasTotales > TopVistas2) {
+            Top3 = Top2; TopVistas3 = TopVistas2;
+            Top2 = p; TopVistas2 = p.VistasTotales;
+        }
+        else if (p.VistasTotales > TopVistas3) {
+            Top3 = p; TopVistas3 = p.VistasTotales;
+        }
+    }
+
+    void mostrarTopVistas() {
+        Nodo<Pelicula<double>>* actual = topMasVistos.getCabeza();
+            int indice = 1;
+        while (actual != nullptr) {
+            cout << indice << ". ";
+            actual->dato.MostrarEnLista();
+                actual = actual->siguiente;
+            indice++;
+            cout << endl;
+        }
+    }
+
+    void mostrarRecientes() {
+        Nodo<Pelicula<double>>* actual = topRecientes.getCabeza();
+            int indice = 4;
+        while (actual != nullptr) {
+            cout << indice << ". ";
+            actual->dato.MostrarEnLista();
+            actual = actual->siguiente;
+            indice++;
+            cout << endl;
+        }
+    }
+
 };
