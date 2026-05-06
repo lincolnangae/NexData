@@ -10,12 +10,13 @@ void EjecutarMenu(Gestionador& sistema) {
         system("cls");
 
         Console::ForegroundColor = ConsoleColor::Green;
-        cout << "========================================" << endl;
-        cout << "             NEXT --- DATA              " << endl;
-        cout << "========================================" << endl;
+
+        gotoxy(getAnchoVentana() / 2 - 20, 0);cout << "========================================" << endl;
+        gotoxy(getAnchoVentana() / 2 - 20, 1);cout << "             NEXT --- DATA              " << endl;
+        gotoxy(getAnchoVentana() / 2 - 20, 2);cout << "========================================" << endl;
 
         Console::ForegroundColor = ConsoleColor::Cyan;
-        cout << "\n----------------------------------------" << endl;
+        cout << "\n------------------------------------------------------------------" << endl;
         cout << "ORDENAR POR: [C]alificacion | A[N]io de Lanzamiento | [A]lfabetico" << endl;
 
         Console::ForegroundColor = ConsoleColor::Yellow;
@@ -42,12 +43,8 @@ void EjecutarMenu(Gestionador& sistema) {
             system("cls");
             int opcionNum = tecla - '0';
             cout << ">>> DETALLE DE PELICULA SELECCIONADA [" << opcionNum << "] <<<" << endl;
-
             sistema.ImprimirInformacion(TmpSeleccion, opcionNum);
-            
-            gotoxy(0, 11); cout << "\nPresione cualquier tecla para volver al menu...";
 
-            tecla = _getch();
         }
 
         else if (tecla == 'c' || tecla == 'C') {

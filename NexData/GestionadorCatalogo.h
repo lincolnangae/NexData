@@ -122,17 +122,30 @@ public:
     }
 
     void ActualizarTopVistas(Pelicula<double> p) {
+        bool huboCambio = 0;
         if (p.VistasTotales > TopVistas1) {
             Top3 = Top2; TopVistas3 = TopVistas2;
             Top2 = Top1; TopVistas2 = TopVistas1;
             Top1 = p; TopVistas1 = p.VistasTotales;
+            huboCambio = 1;
         }
         else if (p.VistasTotales > TopVistas2) {
             Top3 = Top2; TopVistas3 = TopVistas2;
             Top2 = p; TopVistas2 = p.VistasTotales;
+            huboCambio = 1;
+
+
         }
         else if (p.VistasTotales > TopVistas3) {
             Top3 = p; TopVistas3 = p.VistasTotales;
+            huboCambio = 1;
+        }
+
+        if (huboCambio = 1) {
+            topMasVistos = ListaSimple<Pelicula<double>>(3);
+            topMasVistos.InsertarAlInicio(Top3);
+            topMasVistos.InsertarAlInicio(Top2);
+            topMasVistos.InsertarAlInicio(Top1);
         }
     }
 
@@ -163,6 +176,12 @@ public:
         auto cambiarMayuscula = [](char c) {
             return toupper(c);
             };
+        auto limpiarTexto = [](string texto) {
+            for (char& c : texto) {
+                if (c == '-') c = ' ';
+            }
+            return texto;
+            };
         auto cleanScreen = []() {
             system("cls");
         };
@@ -187,8 +206,30 @@ public:
             curr->dato.ImprimirInfoExtendida(1);
             tecla = cambiarMayuscula(_getch());
             switch (tecla) {
-            case 'C': cleanScreen(); break;
-            case 'V': cleanScreen(); break;
+            case 'C': 
+				
+                cleanScreen(); break; //Calificar pelicula
+			case 'V': 
+				curr->dato.VistasTotales++;
+                cleanScreen(); 
+                Console::ForegroundColor = ConsoleColor::Yellow;
+				gotoxy((getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2), 1);
+                cout << "<<<" << limpiarTexto(curr->dato.Titulo) << ">>>";
+                gotoxy((getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2) + (curr->dato.Titulo.length() + 6 - 30)/2, 2);
+                Console::ForegroundColor = ConsoleColor::Cyan;
+                cout << "<<<PELICULA REPRODUCIENDOSE>>>" << endl;
+                Console::ForegroundColor = ConsoleColor::White;
+				gotoxy(1, 5); cout << "En reproduccion... Presione cualquier tecla para finalizar";
+                system("pause>0");
+                cleanScreen();
+                for (auto &g : datosModificables) {
+					if (g.Titulo == curr->dato.Titulo) {
+						g.VistasTotales = curr->dato.VistasTotales;
+						break;
+					}
+                }
+                ActualizarTopVistas(curr->dato);
+                break; //Ver Pelicula (Aumentar vistas totales)
             case 'S': break;
             }
         }
