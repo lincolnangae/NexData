@@ -23,7 +23,7 @@ private:
     int TopVistas1;
     int TopVistas2;
     int TopVistas3;
- 
+
 public:
 
     Gestionador() {
@@ -60,7 +60,7 @@ public:
                     string titulo = marshal_as<string>(title);
 
                     int lanzamiento = Convert::ToInt32(datosP[2]);
-                    
+
                     vector<string> categorias;
                     for (int i = 3; i < (int)datosP->Length; i++) {
                         String^ subcat = datosP[i];
@@ -155,23 +155,23 @@ public:
 
         if (tipo == TipoTop::MASVISTAS) {
             actual = topMasVistos.getCabeza();
-                indice = 1;
+            indice = 1;
         }
         else {
             actual = topRecientes.getCabeza();
-                indice = 4;
+            indice = 4;
         }
 
         while (actual != nullptr) {
             cout << indice << ". ";
             actual->dato.MostrarEnLista();
-                actual = actual->siguiente;
+            actual = actual->siguiente;
             indice++;
             cout << endl;
         }
     }
     //Mostrar Informacion extendida 
-	//Proximo a agregar : Logica para calificar pelicula 
+    //Proximo a agregar : Logica para calificar pelicula 
     void ImprimirInformacion(TipoTop type, int indice) {
         auto cambiarMayuscula = [](char c) {
             return toupper(c);
@@ -184,20 +184,20 @@ public:
             };
         auto cleanScreen = []() {
             system("cls");
-        };
+            };
 
         cleanScreen();
         Nodo<Pelicula<double>>* curr = nullptr;
         int indx;
-        if (type == TipoTop::MASVISTAS){
-			curr = topMasVistos.getCabeza();
+        if (type == TipoTop::MASVISTAS) {
+            curr = topMasVistos.getCabeza();
             indx = 1;
         }
         else {
             curr = topRecientes.getCabeza();
             indx = 4;
         }
-        while(indx != indice && curr != nullptr){
+        while (indx != indice && curr != nullptr) {
             indx++;
             curr = curr->siguiente;
         }
@@ -206,27 +206,27 @@ public:
             curr->dato.ImprimirInfoExtendida(1);
             tecla = cambiarMayuscula(_getch());
             switch (tecla) {
-            case 'C': 
-				
+            case 'C':
+
                 cleanScreen(); break; //Calificar pelicula
-			case 'V': 
-				curr->dato.VistasTotales++;
-                cleanScreen(); 
+            case 'V':
+                curr->dato.VistasTotales++;
+                cleanScreen();
                 Console::ForegroundColor = ConsoleColor::Yellow;
-				gotoxy((getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2), 1);
+                gotoxy((getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2), 1);
                 cout << "<<<" << limpiarTexto(curr->dato.Titulo) << ">>>";
-                gotoxy((getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2) + (curr->dato.Titulo.length() + 6 - 30)/2, 2);
+                gotoxy((getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2) + (curr->dato.Titulo.length() + 6 - 30) / 2, 2);
                 Console::ForegroundColor = ConsoleColor::Cyan;
                 cout << "<<<PELICULA REPRODUCIENDOSE>>>" << endl;
                 Console::ForegroundColor = ConsoleColor::White;
-				gotoxy(1, 5); cout << "En reproduccion... Presione cualquier tecla para finalizar";
+                gotoxy(1, 5); cout << "En reproduccion... Presione cualquier tecla para finalizar";
                 system("pause>0");
                 cleanScreen();
-                for (auto &g : datosModificables) {
-					if (g.Titulo == curr->dato.Titulo) {
-						g.VistasTotales = curr->dato.VistasTotales;
-						break;
-					}
+                for (auto& g : datosModificables) {
+                    if (g.Titulo == curr->dato.Titulo) {
+                        g.VistasTotales = curr->dato.VistasTotales;
+                        break;
+                    }
                 }
                 ActualizarTopVistas(curr->dato);
                 break; //Ver Pelicula (Aumentar vistas totales)
