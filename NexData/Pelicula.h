@@ -40,34 +40,40 @@ public:
         for (const auto& c : Categorias) cout << c << " ";
         cout << endl;
     }
-
-    void MostrarEnCatalogo(int x, int y) {
-        // Lambda para reemplazar el signo - por espacios
+    void ImprimirInfoExtendida(int y) {
         auto limpiarTexto = [](string texto) {
             for (char& c : texto) {
                 if (c == '-') c = ' ';
             }
             return texto;
+        };
+        auto GotoxSimplified = [](int x, int y) {
+            gotoxy(x, y);
             };
 
-        string tituloLimpio = limpiarTexto(Titulo);
-
-        int offsetTitulo = (40 - Titulo.length()) / 2;
-        gotoxy(x + offsetTitulo, y);
-        cout << ">>> " << tituloLimpio << " <<<" << endl;
-
-        gotoxy(x, y + 2);
-        cout << "ANIO : " << Lanzamiento << " | RATING: " << Puntuacion;
-
-        gotoxy(x, y + 4);
+        cout << endl;
+        GotoxSimplified((getAnchoVentana() / 2) - ((Titulo.length()) / 2) - 3, y+3); 
+        Console::ForegroundColor = ConsoleColor::Yellow;
+        cout << "<<<" << limpiarTexto(Titulo) << ">>>";
+        Console::ForegroundColor = ConsoleColor::White;
+        GotoxSimplified(5, y + 5); cout << "ANIO DE LANZAMIENTO: " << Lanzamiento;
+        GotoxSimplified(5, y+6);
+        cout<< "RATING: " << Puntuacion << endl;
+        GotoxSimplified(5, y + 7);
         cout << "CATEGORIAS: ";
-        for (const auto& c : Categorias) cout << c << " ";
-
-        gotoxy(x, y + 6);
+        int indice = 0;
+        for (auto g : Categorias) {
+            cout << g;
+            if (indice < Categorias.size() - 1) cout << " | ";
+            indice++;
+        }
+        cout << endl;
+        GotoxSimplified(5, y + 8);
         cout << "VISTAS TOTALES: " << VistasTotales;
+        GotoxSimplified(5, y + 9);
+		cout << "VOLUMEN DE REPRODUCCION: " << Volumen << endl;
+        GotoxSimplified(0, 0);
+        cout << "CALIFICAR PELICULA [C] | VER PELICULA [V] | SALIR [S]" << endl;
 
-        gotoxy(x, y + 8);
-        cout << "C - CALIFICAR | S - SALIR";
     }
-
 };

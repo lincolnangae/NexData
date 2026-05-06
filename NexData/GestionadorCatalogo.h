@@ -31,11 +31,9 @@ public:
         TopVistas2 = 0;
         TopVistas3 = 0;
     }
-
     ~Gestionador() {
         datosModificables.clear();
     }
-
     void cargarDesdeArchivos() {
         //Nombre de Ruta
         String^ rutaPelis = "DirectorioPeliculas.txt";
@@ -158,6 +156,44 @@ public:
             indice++;
             cout << endl;
         }
+    }
+    //Mostrar Informacion extendida 
+	//Proximo a agregar : Logica para calificar pelicula 
+    void ImprimirInformacion(TipoTop type, int indice) {
+        auto cambiarMayuscula = [](char c) {
+            return toupper(c);
+            };
+        auto cleanScreen = []() {
+            system("cls");
+        };
+
+        cleanScreen();
+        Nodo<Pelicula<double>>* curr = nullptr;
+        int indx;
+        if (type == TipoTop::MASVISTAS){
+			curr = topMasVistos.getCabeza();
+            indx = 1;
+        }
+        else {
+            curr = topRecientes.getCabeza();
+            indx = 4;
+        }
+        while(indx != indice && curr != nullptr){
+            indx++;
+            curr = curr->siguiente;
+        }
+        char tecla = 'i';
+        while (tecla != 'S') {
+            curr->dato.ImprimirInfoExtendida(1);
+            tecla = cambiarMayuscula(_getch());
+            switch (tecla) {
+            case 'C': cleanScreen(); break;
+            case 'V': cleanScreen(); break;
+            case 'S': break;
+            }
+        }
+
+
     }
 
 };

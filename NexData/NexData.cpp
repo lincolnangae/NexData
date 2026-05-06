@@ -6,7 +6,6 @@ using namespace std;
 
 void EjecutarMenu(Gestionador& sistema) {
     char tecla = ' ';
-
     while (tecla != '0') {
         system("cls");
 
@@ -17,7 +16,7 @@ void EjecutarMenu(Gestionador& sistema) {
 
         Console::ForegroundColor = ConsoleColor::Cyan;
         cout << "\n----------------------------------------" << endl;
-        cout << "ORDENAR POR: [C]alificacion | [L]anzamiento | [A]lfabetico" << endl;
+        cout << "ORDENAR POR: [C]alificacion | A[N]io de Lanzamiento | [A]lfabetico" << endl;
 
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ LO MAS VISTO ]\n" << endl;
@@ -36,15 +35,17 @@ void EjecutarMenu(Gestionador& sistema) {
         tecla = _getch();
 
         if (tecla == '0') break;
-
+        TipoTop TmpSeleccion;
+		if (tecla >= '1' && tecla <= '3') TmpSeleccion = TipoTop::MASVISTAS;
+		else  TmpSeleccion = TipoTop::RECIENTES;
         if (tecla >= '1' && tecla <= '6') {
             system("cls");
             int opcionNum = tecla - '0';
             cout << ">>> DETALLE DE PELICULA SELECCIONADA [" << opcionNum << "] <<<" << endl;
 
-            cout << "\n(Proximamente: Se mostrara la informacion extendida de la posicion " << opcionNum << ")" << endl;
-
-            cout << "\nPresione cualquier tecla para volver al menu...";
+            sistema.ImprimirInformacion(TmpSeleccion, opcionNum);
+            
+            gotoxy(0, 11); cout << "\nPresione cualquier tecla para volver al menu...";
 
             tecla = _getch();
         }
