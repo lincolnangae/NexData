@@ -203,7 +203,7 @@ public:
         }
         if (curr == nullptr) {
             //El programa detectaba fuga de memoria, para evitar advertencias agrege esto
-            return; // O lanza una excepción
+            return;
         }
         char tecla = 'i';
         while (tecla != 'S') {
