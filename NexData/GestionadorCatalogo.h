@@ -141,7 +141,7 @@ public:
             huboCambio = 1;
         }
 
-        if (huboCambio = 1) {
+        if (huboCambio == 1) {
             topMasVistos = ListaSimple<Pelicula<double>>(3);
             topMasVistos.InsertarAlInicio(Top3);
             topMasVistos.InsertarAlInicio(Top2);
@@ -200,6 +200,10 @@ public:
         while (indx != indice && curr != nullptr) {
             indx++;
             curr = curr->siguiente;
+        }
+        if (curr == nullptr) {
+            //El programa detectaba fuga de memoria, para evitar advertencias agrege esto
+            return; // O lanza una excepción
         }
         char tecla = 'i';
         while (tecla != 'S') {
