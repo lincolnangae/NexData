@@ -1,7 +1,7 @@
 #pragma once
 #include <windows.h>
 
-void gotoxy(int x, int y) {
+void Gotoxy(int x, int y) {
     HANDLE hcon = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD dwPos;
     dwPos.X = x;
@@ -9,7 +9,7 @@ void gotoxy(int x, int y) {
     SetConsoleCursorPosition(hcon, dwPos);
 
 }
-int getAnchoVentana() {
+int GetAnchoVentana() {
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO csbi;
 

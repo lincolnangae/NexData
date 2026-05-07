@@ -5,20 +5,20 @@
 #include "Pelicula.h"
 
 //Clase principal que controla el flujo de datos
-enum class TipoTop { RECIENTES, MASVISTAS };
+enum class TipoTop { RECIENTES, MASVISTAS , VISTOSRECIENTES };
 class Gestionador {
 private:
 
-    ListaCircularDoble<Pelicula<double>> catalogo;
-    vector<Pelicula<double>> datosModificables; //Lista para actualizar "DirectorioDatos.txt"
-    ListaSimple<Pelicula<double>> topMasVistos; //Los Mas Vistos
-    ListaSimple<Pelicula<double>> topRecientes; //Los ultimos de la lista
+    ListaCircularDoble<Pelicula<double>> Catalogo;
+    vector<Pelicula<double>> DatosModificables; //Lista para actualizar "DirectorioDatos.txt"
+    ListaSimple<Pelicula<double>> TopMasVistos; //Los Mas Vistos
+    ListaSimple<Pelicula<double>> TopRecientes; //Los ultimos de la lista
+    ListaSimple<Pelicula<double>> TopRecienVistos; //Los ultimos de la lista
 
     //Vistas Referenciales
     Pelicula<double> Top1;
     Pelicula<double> Top2;
     Pelicula<double> Top3;
-
 
     int TopVistas1;
     int TopVistas2;
@@ -32,7 +32,7 @@ public:
         TopVistas3 = 0;
     }
     ~Gestionador() {
-        datosModificables.clear();
+        DatosModificables.clear();
     }
     void cargarDesdeArchivos() {
         //Nombre de Ruta
@@ -77,23 +77,21 @@ public:
 
                     ActualizarTopVistas(nuevaPeli);
 
-                    catalogo.InsertarAlFinal(nuevaPeli);
-                    datosModificables.push_back(nuevaPeli);
-                    topRecientes.InsertarAlInicio(nuevaPeli);
+                    Catalogo.InsertarAlFinal(nuevaPeli);
+                    DatosModificables.push_back(nuevaPeli);
+                    TopRecientes.InsertarAlInicio(nuevaPeli);
                 }
             }
             catch (Exception^ ex) {
                 cout << "Error critico al procesar los datos: " << marshal_as<string>(ex->Message) << endl;
             }
             finally {
-
                 if (TopVistas1 > 0) {
                     //al final de el while y despues de comparar, recien ubicamos las peliculas
-                    topMasVistos.InsertarAlInicio(Top3);
-                    topMasVistos.InsertarAlInicio(Top2);
-                    topMasVistos.InsertarAlInicio(Top1);
+                    TopMasVistos.InsertarAlInicio(Top3);
+                    TopMasVistos.InsertarAlInicio(Top2);
+                    TopMasVistos.InsertarAlInicio(Top1);
                 }
-
                 lectorPelis->Close();
                 lectorDatos->Close();
             }
@@ -106,7 +104,7 @@ public:
         StreamWriter^ escritor = gcnew StreamWriter(rutaDatos);
 
         try {
-            for (const auto& peli : datosModificables) {
+            for (const auto& peli : DatosModificables) {
                 String^ linea = peli.Orden + "," +
                     peli.Puntuacion + "," +
                     peli.Volumen + "," +
@@ -142,48 +140,58 @@ public:
         int indice = 0;
 
         if (tipo == TipoTop::MASVISTAS) {
-            actual = topMasVistos.getCabeza();
+            actual = TopMasVistos.GetCabeza();
             indice = 1;
         }
-        else {
-            actual = topRecientes.getCabeza();
+        else if (tipo == TipoTop::RECIENTES) {
+            actual = TopRecientes.GetCabeza();
             indice = 4;
+        }
+        else {
+            actual = TopRecienVistos.GetCabeza();
+            indice = 7;
         }
 
         while (actual != nullptr) {
             cout << indice << ". ";
-            actual->dato.MostrarEnLista();
+            actual->Dato.MostrarEnLista();
             actual = actual->siguiente;
             indice++;
             cout << endl;
         }
+
     }
     //Mostrar Informacion extendida 
     //Proximo a agregar : Logica para calificar pelicula 
     void ImprimirInformacion(TipoTop type, int indice) {
-        auto cambiarMayuscula = [](char c) {
+        auto CambiarMayuscula = [](char c) {
             return toupper(c);
             };
-        auto limpiarTexto = [](string texto) {
+        auto LimpiarTexto = [](string texto) {
             for (char& c : texto) {
                 if (c == '-') c = ' ';
             }
             return texto;
             };
-        auto cleanScreen = []() {
+        auto CleanScreen = []() {
             system("cls");
             };
 
-        cleanScreen();
+        CleanScreen();
         Nodo<Pelicula<double>>* curr = nullptr;
+
         int indx;
         if (type == TipoTop::MASVISTAS) {
-            curr = topMasVistos.getCabeza();
+            curr = TopMasVistos.GetCabeza();
             indx = 1;
         }
-        else {
-            curr = topRecientes.getCabeza();
+        else if (type == TipoTop::RECIENTES) {
+            curr = TopRecientes.GetCabeza();
             indx = 4;
+        }
+        else {
+            curr = TopRecienVistos.GetCabeza();
+            indx = 7;
         }
         while (indx != indice && curr != nullptr) {
             indx++;
@@ -193,23 +201,50 @@ public:
             //El programa detectaba fuga de memoria, para evitar advertencias agrege esto
             return;
         }
-        char tecla = 'i';
+        char tecla = ' ';
         while (tecla != 'S') {
-            curr->dato.ImprimirInfoExtendida(1);
-            tecla = cambiarMayuscula(_getch());
+            curr->Dato.ImprimirInfoExtendida(1);
+            tecla = CambiarMayuscula(_getch());
             switch (tecla) {
             case 'C':
-                cleanScreen();
+                CleanScreen();
+                Console::ForegroundColor = ConsoleColor::Yellow;
+                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(curr->Dato.Titulo.length()) / 2), 1);
+                cout << "<<CALIFICAR PELICULA>>";
+                Console::ForegroundColor = ConsoleColor::White;
+                cout << endl;
+                //Usamos limits como buena practica para evitar errores al usar cin
+                double ValueRatingTemp;
+                do {
+                    cout << "Introduce una calificacion [0-10]: ";
+                    cin >> ValueRatingTemp;
 
-                cleanScreen(); break; //Calificar pelicula
+                    if (cin.fail()) {
+                        cin.clear();
+                        cin.ignore((numeric_limits<streamsize>::max)(), '\n');
+                        cout << "Error: No se permiten letras o simbolos." << endl;
+                        ValueRatingTemp = -1;
+                        continue;
+                    }
+
+                    if (ValueRatingTemp < 0 || ValueRatingTemp > 10) {
+                        cout << "Rango invalido. Intenta de nuevo." << endl;
+                        cout << endl;
+                    }
+
+                } while (ValueRatingTemp < 0 || ValueRatingTemp > 10);
+                //esta solo para validar ya, limits esta en dependencias
+                CleanScreen(); 
+                break; //Calificar pelicula
             case 'V':
-                curr->dato.VistasTotales++;
-                cleanScreen();
+                curr->Dato.VistasTotales++;
+                TopRecienVistos.InsertarAlInicio(curr->Dato);
+                CleanScreen();
                 Console::ForegroundColor = ConsoleColor::Yellow;
                 //El copilador toma de advertencia para size_t a int, asi que decimos que el dato size_t se convierta en int antes de copilar
-                gotoxy((int)(getAnchoVentana() / 2) - ((int)(curr->dato.Titulo.length()) / 2), 1);
-                cout << "<<<" << limpiarTexto(curr->dato.Titulo) << ">>>";
-                gotoxy((int)(getAnchoVentana() / 2) - ((int)(curr->dato.Titulo.length()) / 2) + ((int)curr->dato.Titulo.length() + 6 - 30) / 2, 2);
+                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(curr->Dato.Titulo.length()) / 2), 1);
+                cout << "<<<" << LimpiarTexto(curr->Dato.Titulo) << ">>>";
+                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(curr->Dato.Titulo.length()) / 2) + ((int)curr->Dato.Titulo.length() + 6 - 30) / 2, 2);
                 Console::ForegroundColor = ConsoleColor::Cyan;
                 cout << "<<<PELICULA REPRODUCIENDOSE>>>" << endl;
                 cout << endl;
@@ -217,14 +252,14 @@ public:
                 Console::ForegroundColor = ConsoleColor::White;
                 cout << endl << "En reproduccion... Presione cualquier tecla para finalizar";
                 system("pause>0");
-                cleanScreen();
-                for (auto& temp : datosModificables) {
-                    if (temp.Titulo == curr->dato.Titulo) {
-                        temp.VistasTotales = curr->dato.VistasTotales;
+                CleanScreen();
+                for (auto& temp : DatosModificables) {
+                    if (temp.Titulo == curr->Dato.Titulo) {
+                        temp.VistasTotales = curr->Dato.VistasTotales;
                         break;
                     }
                 }
-                ActualizarTopVistas(curr->dato);
+                ActualizarTopVistas(curr->Dato);
                 break; //Ver Pelicula (Aumentar vistas totales)
             case 'S': break;
             }
@@ -232,5 +267,4 @@ public:
 
 
     }
-
 };

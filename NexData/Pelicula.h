@@ -31,7 +31,6 @@ public:
             }
             return texto;
             };
-
         string tituloLimpio = limpiarTexto(Titulo);
 
         cout << "[" << Orden << "] " << tituloLimpio << " (" << Lanzamiento << ")" << endl;
@@ -40,6 +39,7 @@ public:
         for (const auto& c : Categorias) cout << c << " ";
         cout << endl;
     }
+
     void ImprimirInfoExtendida(int y) {
         auto limpiarTexto = [](string texto) {
             for (char& c : texto) {
@@ -48,11 +48,11 @@ public:
             return texto;
         };
         auto GotoxSimplified = [](int x, int y) {
-            gotoxy(x, y);
+            Gotoxy(x, y);
             };
 
         cout << endl;
-        GotoxSimplified((int)((getAnchoVentana() / 2) - (Titulo.length() / 2) - 3), y + 3);
+        GotoxSimplified((int)((GetAnchoVentana() / 2) - (Titulo.length() / 2) - 3), y + 3);
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "<<<" << limpiarTexto(Titulo) << ">>>";
         Console::ForegroundColor = ConsoleColor::White;
@@ -71,7 +71,7 @@ public:
         GotoxSimplified(5, y + 8);
         cout << "VISTAS TOTALES: " << VistasTotales;
         GotoxSimplified(5, y + 9);
-		cout << "VOLUMEN DE REPRODUCCION: " << Volumen << endl;
+		cout << "CANTIDAD DE USUARIOS VOTANTES: " << Volumen << endl;
         GotoxSimplified(0, 0);
         cout << "CALIFICAR PELICULA [C] | VER PELICULA [V] | SALIR [S]" << endl;
 

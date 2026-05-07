@@ -12,16 +12,22 @@ public:
     ListaSimple(int _capacidad = 3) : cabeza(nullptr), capacidad(_capacidad), actual(0) {}
 
     void InsertarAlInicio(T_Format dato) {
-        Nodo<T_Format>* nuevo = new Nodo<T_Format>(dato);
+        if (cabeza != nullptr) {
+            if (dato.Titulo == cabeza->Dato.Titulo) {
+                return;
+            }
+        }
 
-        if (actual == capacidad) {
+        if (actual >= capacidad) {
             EliminarUltimo();
         }
 
+        Nodo<T_Format>* nuevo = new Nodo<T_Format>(dato);
         nuevo->siguiente = cabeza;
         cabeza = nuevo;
         actual++;
     }
+
     void InsertarEnPosicion(int indx, T_Format dato) {
 		Nodo<T_Format>* nuevo = new Nodo<T_Format>(dato);
         Nodo<T_Format>* curr = cabeza;
@@ -58,5 +64,7 @@ public:
         actual--;
     }
 
-    Nodo<T_Format>* getCabeza() { return cabeza; }
+    Nodo<T_Format> GetCabeza2() { cabeza; }
+
+    Nodo<T_Format>* GetCabeza() { return cabeza; }
 };

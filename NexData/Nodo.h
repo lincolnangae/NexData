@@ -4,9 +4,9 @@
 template <typename T_Generico>
 class Nodo {
 public:
-    T_Generico dato;
+    T_Generico Dato;
     Nodo<T_Generico>* siguiente;
     Nodo<T_Generico>* anterior;
 
-    Nodo(T_Generico valor) : dato(valor), siguiente(nullptr), anterior(nullptr) {}
+    Nodo(T_Generico valor) : Dato(valor), siguiente(nullptr), anterior(nullptr) {}
 };

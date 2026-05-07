@@ -3,6 +3,7 @@
 #include <string>
 #include"conio.h"
 #include <msclr/marshal_cppstd.h>
+#include <limits>
 #include<vector>
 #include"chrono"
 #include"thread"
