@@ -29,6 +29,12 @@ public:
     }
 
     void InsertarEnPosicion(int indx, T_Format dato) {
+        if (cabeza != nullptr) {
+            if (dato.Titulo == cabeza->Dato.Titulo) {
+                return;
+            }
+        }
+
 		Nodo<T_Format>* nuevo = new Nodo<T_Format>(dato);
         Nodo<T_Format>* curr = cabeza;
         if (indx == 1) {

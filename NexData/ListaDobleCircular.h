@@ -13,6 +13,13 @@ public:
     ListaCircularDoble() : cabeza(nullptr), cantidad(0) {}
 
     void InsertarAlFinal(T dato) {
+
+        if (cabeza != nullptr) {
+            if (dato.Titulo == cabeza->Dato.Titulo) {
+                return;
+            }
+        }
+
         Nodo<T>* nuevo = new Nodo<T>(dato);
         if (!cabeza) {
             cabeza = nuevo;
