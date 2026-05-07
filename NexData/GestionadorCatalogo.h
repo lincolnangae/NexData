@@ -88,6 +88,7 @@ public:
             finally {
 
                 if (TopVistas1 > 0) {
+                    //al final de el while y despues de comparar, recien ubicamos las peliculas
                     topMasVistos.InsertarAlInicio(Top3);
                     topMasVistos.InsertarAlInicio(Top2);
                     topMasVistos.InsertarAlInicio(Top1);
@@ -122,30 +123,17 @@ public:
     }
 
     void ActualizarTopVistas(Pelicula<double> p) {
-        bool huboCambio = 0;
         if (p.VistasTotales > TopVistas1) {
             Top3 = Top2; TopVistas3 = TopVistas2;
             Top2 = Top1; TopVistas2 = TopVistas1;
             Top1 = p; TopVistas1 = p.VistasTotales;
-            huboCambio = 1;
         }
         else if (p.VistasTotales > TopVistas2) {
             Top3 = Top2; TopVistas3 = TopVistas2;
             Top2 = p; TopVistas2 = p.VistasTotales;
-            huboCambio = 1;
-
-
         }
         else if (p.VistasTotales > TopVistas3) {
             Top3 = p; TopVistas3 = p.VistasTotales;
-            huboCambio = 1;
-        }
-
-        if (huboCambio == 1) {
-            topMasVistos = ListaSimple<Pelicula<double>>(3);
-            topMasVistos.InsertarAlInicio(Top3);
-            topMasVistos.InsertarAlInicio(Top2);
-            topMasVistos.InsertarAlInicio(Top1);
         }
     }
 
@@ -218,9 +206,9 @@ public:
                 cleanScreen();
                 Console::ForegroundColor = ConsoleColor::Yellow;
                 //El copilador toma de advertencia para size_t a int, asi que decimos que el dato size_t se convierta en int antes de copilar
-                gotoxy((int)(getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2), 1);
+                gotoxy((int)(getAnchoVentana() / 2) - ((int)(curr->dato.Titulo.length()) / 2), 1);
                 cout << "<<<" << limpiarTexto(curr->dato.Titulo) << ">>>";
-                gotoxy((getAnchoVentana() / 2) - ((int)(curr->dato.Titulo.length()) / 2) + (curr->dato.Titulo.length() + 6 - 30) / 2, 2);
+                gotoxy((int)(getAnchoVentana() / 2) - ((int)(curr->dato.Titulo.length()) / 2) + ((int)curr->dato.Titulo.length() + 6 - 30) / 2, 2);
                 Console::ForegroundColor = ConsoleColor::Cyan;
                 cout << "<<<PELICULA REPRODUCIENDOSE>>>" << endl;
                 Console::ForegroundColor = ConsoleColor::White;
