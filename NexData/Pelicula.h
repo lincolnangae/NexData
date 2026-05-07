@@ -52,7 +52,7 @@ public:
             };
 
         cout << endl;
-        GotoxSimplified((getAnchoVentana() / 2) - ((Titulo.length()) / 2) - 3, y+3); 
+        GotoxSimplified((int)((getAnchoVentana() / 2) - (Titulo.length() / 2) - 3), y + 3);
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "<<<" << limpiarTexto(Titulo) << ">>>";
         Console::ForegroundColor = ConsoleColor::White;

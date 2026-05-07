@@ -27,3 +27,11 @@ int getAltoVentana() {
     }
     return -1; // error
 }
+
+void Dibujo() {
+    int Matriz[35][100]{
+        35
+    };
+
+
+}

@@ -217,9 +217,10 @@ public:
                 curr->dato.VistasTotales++;
                 cleanScreen();
                 Console::ForegroundColor = ConsoleColor::Yellow;
-                gotoxy((getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2), 1);
+                //El copilador toma de advertencia para size_t a int, asi que decimos que el dato size_t se convierta en int antes de copilar
+                gotoxy((int)(getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2), 1);
                 cout << "<<<" << limpiarTexto(curr->dato.Titulo) << ">>>";
-                gotoxy((getAnchoVentana() / 2) - ((curr->dato.Titulo.length()) / 2) + (curr->dato.Titulo.length() + 6 - 30) / 2, 2);
+                gotoxy((getAnchoVentana() / 2) - ((int)(curr->dato.Titulo.length()) / 2) + (curr->dato.Titulo.length() + 6 - 30) / 2, 2);
                 Console::ForegroundColor = ConsoleColor::Cyan;
                 cout << "<<<PELICULA REPRODUCIENDOSE>>>" << endl;
                 Console::ForegroundColor = ConsoleColor::White;
