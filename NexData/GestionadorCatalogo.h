@@ -199,6 +199,7 @@ public:
             tecla = cambiarMayuscula(_getch());
             switch (tecla) {
             case 'C':
+                cleanScreen();
 
                 cleanScreen(); break; //Calificar pelicula
             case 'V':
@@ -217,9 +218,9 @@ public:
                 cout << endl << "En reproduccion... Presione cualquier tecla para finalizar";
                 system("pause>0");
                 cleanScreen();
-                for (auto& g : datosModificables) {
-                    if (g.Titulo == curr->dato.Titulo) {
-                        g.VistasTotales = curr->dato.VistasTotales;
+                for (auto& temp : datosModificables) {
+                    if (temp.Titulo == curr->dato.Titulo) {
+                        temp.VistasTotales = curr->dato.VistasTotales;
                         break;
                     }
                 }

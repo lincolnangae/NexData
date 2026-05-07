@@ -15,7 +15,7 @@ public:
         Nodo<T_Format>* nuevo = new Nodo<T_Format>(dato);
 
         if (actual == capacidad) {
-            eliminarUltimo();
+            EliminarUltimo();
         }
 
         nuevo->siguiente = cabeza;
@@ -41,7 +41,7 @@ public:
     }
     //Como dijimos, en el menu principal solo se mostraran 3 peliculas
     //Esta logica evita que cualquiera de estas tenga mas de  3 elementos
-    void eliminarUltimo() {
+    void EliminarUltimo() {
         if (!cabeza) return;
         if (!cabeza->siguiente) {
             delete cabeza;
