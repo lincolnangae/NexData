@@ -211,8 +211,10 @@ public:
                 gotoxy((int)(getAnchoVentana() / 2) - ((int)(curr->dato.Titulo.length()) / 2) + ((int)curr->dato.Titulo.length() + 6 - 30) / 2, 2);
                 Console::ForegroundColor = ConsoleColor::Cyan;
                 cout << "<<<PELICULA REPRODUCIENDOSE>>>" << endl;
+                cout << endl;
+                Dibujo();
                 Console::ForegroundColor = ConsoleColor::White;
-                gotoxy(1, 5); cout << "En reproduccion... Presione cualquier tecla para finalizar";
+                cout << endl << "En reproduccion... Presione cualquier tecla para finalizar";
                 system("pause>0");
                 cleanScreen();
                 for (auto& g : datosModificables) {
