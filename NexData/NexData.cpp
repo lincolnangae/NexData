@@ -10,7 +10,6 @@ void EjecutarMenu(Gestionador& sistema) {
         system("cls");
         TipoTop TmpSeleccion = TipoTop::MASVISTAS;
 
-
         Console::ForegroundColor = ConsoleColor::Green;
 
         Gotoxy(GetAnchoVentana() / 2 - 20, 0);cout << "========================================" << endl;
