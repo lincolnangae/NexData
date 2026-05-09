@@ -122,17 +122,30 @@ public:
     }
 
     void ActualizarTopVistas(Pelicula<double> p) {
+        bool huboCambio = 0;
         if (p.VistasTotales > TopVistas1) {
             Top3 = Top2; TopVistas3 = TopVistas2;
             Top2 = Top1; TopVistas2 = TopVistas1;
             Top1 = p; TopVistas1 = p.VistasTotales;
+            huboCambio = 1;
         }
         else if (p.VistasTotales > TopVistas2) {
             Top3 = Top2; TopVistas3 = TopVistas2;
             Top2 = p; TopVistas2 = p.VistasTotales;
+            huboCambio = 1;
+
+
         }
         else if (p.VistasTotales > TopVistas3) {
             Top3 = p; TopVistas3 = p.VistasTotales;
+            huboCambio = 1;
+        }
+
+        if (huboCambio = 1) {
+            TopMasVistos = ListaSimple<Pelicula<double>>(3);
+            TopMasVistos.InsertarAlInicio(Top3);
+            TopMasVistos.InsertarAlInicio(Top2);
+            TopMasVistos.InsertarAlInicio(Top1);
         }
     }
 
