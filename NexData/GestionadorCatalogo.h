@@ -11,7 +11,6 @@ private:
 
     ListaCircularDoble<Pelicula<double>> Catalogo;
     ListaCircularDoble<Pelicula<double>> VerMasTarde; //Los recientes vistos
-    vector<Pelicula<double>> DatosModificables; //Lista para actualizar "DirectorioDatos.txt"
     ListaSimple<Pelicula<double>> TopMasVistos; //Los Mas Vistos
     ListaSimple<Pelicula<double>> TopRecientes; //Los ultimos de la lista
     ListaSimple<Pelicula<double>> TopRecienVistos; //Los ultimos de la lista
@@ -34,7 +33,6 @@ public:
         TopVistas3 = 0;
     }
     ~Gestionador() {
-        DatosModificables.clear();
     }
     void CargarDesdeArchivos() {
         //Nombre de Ruta
@@ -80,7 +78,6 @@ public:
                     ActualizarTopVistas(nuevaPeli);
 
                     Catalogo.InsertarAlFinal(nuevaPeli);
-                    DatosModificables.push_back(nuevaPeli);
                     TopRecientes.InsertarAlInicio(nuevaPeli);
                 }
             }
@@ -96,23 +93,31 @@ public:
 
     void GuardarDatos() {
         String^ rutaDatos = "DirectorioDatos.txt";
-
+        // Forzamos el punto decimal para evitar conflictos
+        System::Globalization::CultureInfo^ cultura = System::Globalization::CultureInfo::InvariantCulture;
         StreamWriter^ escritor = gcnew StreamWriter(rutaDatos);
+        Nodo<Pelicula<double>>* actual = Catalogo.GetCabeza();
 
-        try {
-            for (const auto& peli : DatosModificables) {
-                String^ linea = peli.Orden + "," +
-                    peli.Puntuacion + "," +
-                    peli.Volumen + "," +
-                    peli.VistasTotales;
-                escritor->WriteLine(linea);
+        if (actual != nullptr) {
+            try {
+                do {
+                    Pelicula<double>& p = actual->Dato;
+                    String^ linea = String::Format(cultura, "{0},{1:F2},{2},{3}",
+                        p.Orden,
+                        p.Puntuacion,
+                        p.Volumen,
+                        p.VistasTotales);
+
+                    escritor->WriteLine(linea);
+                    actual = actual->siguiente;
+                } while (actual != Catalogo.GetCabeza());
             }
-        }
-        catch (Exception^ ex) {
-            cout << "Error al guardar datos: " << marshal_as<string>(ex->Message) << endl;
-        }
-        finally {
-            escritor->Close();
+            catch (Exception^ ex) {
+                cout << "Error al guardar: " << marshal_as<string>(ex->Message) << endl;
+            }
+            finally {
+                escritor->Close();
+            }
         }
     }
 
@@ -187,178 +192,28 @@ public:
 
     }
     //Mostrar Informacion extendida 
-    //Proximo a agregar : Logica para calificar pelicula 
     void ImprimirInformacion(TipoTop type, int indice) {
-        auto CambiarMayuscula = [](char c) {
-            return toupper(c);
-            };
-        auto LimpiarTexto = [](string texto) {
-            for (char& c : texto) {
-                if (c == '-') c = ' ';
-            }
-            return texto;
-            };
-        auto CleanScreen = []() {
-            system("cls");
-            };
-
+        auto CleanScreen = []() { system("cls"); };
         CleanScreen();
         Nodo<Pelicula<double>>* curr = nullptr;
+        int indx = (type == TipoTop::MASVISTAS) ? 1 : (type == TipoTop::RECIENTES ? 4 : 7);
 
-        int indx;
-        if (type == TipoTop::MASVISTAS) {
-            curr = TopMasVistos.GetCabeza();
-            indx = 1;
-        }
-        else if (type == TipoTop::RECIENTES) {
-            curr = TopRecientes.GetCabeza();
-            indx = 4;
-        }
-        else {
-            curr = TopRecienVistos.GetCabeza();
-            indx = 7;
-        }
+        if (type == TipoTop::MASVISTAS) curr = TopMasVistos.GetCabeza();
+        else if (type == TipoTop::RECIENTES) curr = TopRecientes.GetCabeza();
+        else curr = TopRecienVistos.GetCabeza();
+
         while (indx != indice && curr != nullptr) {
             indx++;
             curr = curr->siguiente;
         }
-        if (curr == nullptr) {
-            //El programa detectaba fuga de memoria, para evitar advertencias agrege esto
-            return;
+
+        if (curr != nullptr) {
+            ImprimirInformacionDesdePelicula(curr->Dato);
         }
-        char tecla = ' ';
-        while (tecla != 'S') {
-            // Verificar si la película está guardada en "Ver más tarde"
-            Nodo<Pelicula<double>>* tempCheck = VerMasTarde.GetCabeza();
-            bool estaGuardada = false;
-
-            while (tempCheck != nullptr) {
-                if (tempCheck->Dato.Titulo == curr->Dato.Titulo) {
-                    estaGuardada = true;
-                    break;
-                }
-                tempCheck = tempCheck->siguiente;
-            }
-
-            // Mostrar la información con el indicador de guardado
-            curr->Dato.ImprimirInfoExtendida(1, estaGuardada);
-            tecla = CambiarMayuscula(_getch());
-            switch (tecla) {
-            case 'C':
-                CleanScreen();
-                Console::ForegroundColor = ConsoleColor::Yellow;
-                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(curr->Dato.Titulo.length()) / 2), 1);
-                cout << "<<CALIFICAR PELICULA>>";
-                Console::ForegroundColor = ConsoleColor::White;
-                cout << endl;
-                //Usamos limits como buena practica para evitar errores al usar cin
-                double ValueRatingTemp;
-                do {
-                    cout << "Introduce una calificacion [0-10]: ";
-                    cin >> ValueRatingTemp;
-
-                    if (cin.fail()) {
-                        cin.clear();
-                        cin.ignore((numeric_limits<streamsize>::max)(), '\n');
-                        cout << "Error: No se permiten letras o simbolos." << endl;
-                        ValueRatingTemp = -1;
-                        continue;
-                    }
-
-                    if (ValueRatingTemp < 0 || ValueRatingTemp > 10) {
-                        cout << "Rango invalido. Intenta de nuevo." << endl;
-                        cout << endl;
-                    }
-
-                } while (ValueRatingTemp < 0 || ValueRatingTemp > 10);
-                //esta solo para validar ya, limits esta en dependencias
-                CleanScreen(); 
-                break; //Calificar pelicula
-            case 'V':
-                curr->Dato.VistasTotales++;
-                TopRecienVistos.InsertarAlInicio(curr->Dato);
-                CleanScreen();
-                Console::ForegroundColor = ConsoleColor::Yellow;
-                //El copilador toma de advertencia para size_t a int, asi que decimos que el dato size_t se convierta en int antes de copilar
-                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(curr->Dato.Titulo.length()) / 2), 1);
-                cout << "<<<" << LimpiarTexto(curr->Dato.Titulo) << ">>>";
-                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(curr->Dato.Titulo.length()) / 2) + ((int)curr->Dato.Titulo.length() + 6 - 30) / 2, 2);
-                Console::ForegroundColor = ConsoleColor::Cyan;
-                cout << "<<<PELICULA REPRODUCIENDOSE>>>" << endl;
-                cout << endl;
-                Dibujo();
-                Console::ForegroundColor = ConsoleColor::White;
-                cout << endl << "En reproduccion... Presione cualquier tecla para finalizar";
-                system("pause>0");
-                CleanScreen();
-                for (auto& temp : DatosModificables) {
-                    if (temp.Titulo == curr->Dato.Titulo) {
-                        temp.VistasTotales = curr->Dato.VistasTotales;
-                        break;
-                    }
-                }
-                ActualizarTopVistas(curr->Dato);
-                break; //Ver Pelicula (Aumentar vistas totales)
-            case 'G':
-                {
-                    // Verificar si ya está en la lista antes de guardar
-                    Nodo<Pelicula<double>>* tempCheck = VerMasTarde.GetCabeza();
-                    bool yaGuardada = false;
-
-                    while (tempCheck != nullptr) {
-                        if (tempCheck->Dato.Titulo == curr->Dato.Titulo) {
-                            yaGuardada = true;
-                            break;
-                        }
-                        tempCheck = tempCheck->siguiente;
-                    }
-
-                    CleanScreen();
-
-                    if (yaGuardada) {
-                        Console::ForegroundColor = ConsoleColor::Yellow;
-                        Gotoxy((int)(GetAnchoVentana() / 2) - 20, 1);
-                        cout << "PELICULA YA GUARDADA";
-                        Console::ForegroundColor = ConsoleColor::White;
-                        cout << endl << endl;
-                        cout << "La pelicula '" << LimpiarTexto(curr->Dato.Titulo) << "' ya estaba en tu lista 'Ver mas tarde'." << endl;
-                    } else {
-                        VerMasTarde.InsertarAlInicio(curr->Dato);
-                        Console::ForegroundColor = ConsoleColor::Green;
-                        Gotoxy((int)(GetAnchoVentana() / 2) - 25, 1);
-                        cout << "PELICULA GUARDADA PARA VER MAS TARDE";
-                        Console::ForegroundColor = ConsoleColor::White;
-                        cout << endl << endl;
-                        cout << "La pelicula '" << LimpiarTexto(curr->Dato.Titulo) << "' ha sido guardada exitosamente." << endl;
-                    }
-
-                    system("pause");
-                    CleanScreen();  // ← LIMPIAR PANTALLA DESPUÉS DE PAUSE
-                }
-                break; //Guardar para ver más tarde
-            case 'S': break;
-            }
-        }
-
-
-
     }
 
-    // Método auxiliar para obtener película por índice desde DatosModificables
-    Pelicula<double> ObtenerPeliculaPorIndice(int indice) {
-        // Usar DatosModificables que es un vector con todas las películas cargadas desde el TXT
-        if (indice > 0 && indice <= (int)DatosModificables.size()) {
-            // Los vectores empiezan en 0, usuario cuenta desde 1
-            return DatosModificables[indice - 1];  
-        }
-        // Retorna película vacía si no existe
-        return Pelicula<double>();  
-    }
-
-    // Método auxiliar para contar películas en el catálogo
     int ContarPeliculasEnCatalogo() {
-        // Retorna el tamaño del vector
-        return (int)DatosModificables.size(); 
+        return (int)Catalogo.GetCantidad(); 
     }
 
     void GuardarParaVerMasTarde() {
@@ -714,134 +569,147 @@ public:
 
     //menu mostraro al elegir una pelicula
     void ImprimirInformacionDesdePelicula(Pelicula<double>& peli) {
-        auto CambiarMayuscula = [](char c) {
-            return toupper(c);
-            };
+        auto CambiarMayuscula = [](char c) { return toupper(c); };
         auto LimpiarTexto = [](string texto) {
-            for (char& c : texto) {
-                if (c == '-') c = ' ';
-            }
+            for (char& c : texto) if (c == '-') c = ' ';
             return texto;
             };
-        auto CleanScreen = []() {
-            system("cls");
-            };
+        auto CleanScreen = []() { system("cls"); };
 
-        CleanScreen();
         char tecla = ' ';
 
         while (tecla != 'S') {
-            // Verificar si la película está guardada
+            CleanScreen();
+
             Nodo<Pelicula<double>>* tempCheck = VerMasTarde.GetCabeza();
             bool estaGuardada = false;
-
-            while (tempCheck != nullptr) {
-                if (tempCheck->Dato.Titulo == peli.Titulo) {
-                    estaGuardada = true;
-                    break;
-                }
-                tempCheck = tempCheck->siguiente;
+            if (tempCheck != nullptr) {
+                do {
+                    if (tempCheck->Dato.Titulo == peli.Titulo) {
+                        estaGuardada = true;
+                        break;
+                    }
+                    tempCheck = tempCheck->siguiente;
+                } while (tempCheck != VerMasTarde.GetCabeza());
             }
 
             peli.ImprimirInfoExtendida(1, estaGuardada);
-            tecla = CambiarMayuscula(_getch());
+                tecla = CambiarMayuscula(_getch());
 
-            switch (tecla) {
-            case 'C':
-                CleanScreen();
-                Console::ForegroundColor = ConsoleColor::Yellow;
-                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(peli.Titulo.length()) / 2), 1);
-                cout << "<<CALIFICAR PELICULA>>";
-                Console::ForegroundColor = ConsoleColor::White;
-                cout << endl;
+                if (tecla == 'C') { // CALIFICAR
+                    system("cls");
+                    double calif = -1;
 
-                double ValueRatingTemp;
-                do {
-                    cout << "Introduce una calificacion [0-10]: ";
-                    cin >> ValueRatingTemp;
-
-                    if (cin.fail()) {
+                    // Validación de entrada
+                    while (true) {
+                        cout << "Calificar '" << peli.Titulo << "' [0.0 - 10.0]: ";
+                        if (cin >> calif && calif >= 0 && calif <= 10) {
+                            cin.ignore((numeric_limits<streamsize>::max)(), '\n');
+                            break;
+                        }
+                        cout << "Error: Ingresa un valor valido entre 0 y 10." << endl;
                         cin.clear();
                         cin.ignore((numeric_limits<streamsize>::max)(), '\n');
-                        cout << "Error: No se permiten letras o simbolos." << endl;
-                        ValueRatingTemp = -1;
-                        continue;
                     }
 
-                    if (ValueRatingTemp < 0 || ValueRatingTemp > 10) {
-                        cout << "Rango invalido. Intenta de nuevo." << endl;
-                        cout << endl;
-                    }
-                } while (ValueRatingTemp < 0 || ValueRatingTemp > 10);
-                CleanScreen();
-                break;
+                    // Cálculo puro (sin redondeos intermedios que limiten el rango)
+                    double califActual = peli.Puntuacion;
+                    int volumenActual = peli.Volumen;
 
-            case 'V':
+                    double nuevaSuma = (califActual * volumenActual) + calif;
+                    int nuevoVolumen = volumenActual + 1;
+
+                    // El double guardará la precisión total en RAM
+                    peli.Puntuacion = nuevaSuma / nuevoVolumen;
+                    peli.Volumen = nuevoVolumen;
+
+                    // Sincronización con el Catálogo Principal (Fuente de verdad)
+                    Nodo<Pelicula<double>>* aux = Catalogo.GetCabeza();
+                    if (aux != nullptr) {
+                        do {
+                            if (aux->Dato.Titulo == peli.Titulo) {
+                                aux->Dato.Puntuacion = peli.Puntuacion;
+                                aux->Dato.Volumen = peli.Volumen;
+                                aux->Dato.VistasTotales = peli.VistasTotales;
+                                break;
+                            }
+                            aux = aux->siguiente;
+                        } while (aux != Catalogo.GetCabeza());
+                    }
+
+                    // Persistencia y actualización de vistas
+                    GuardarDatos();
+                    ActualizarTopVistas(peli);
+
+                    // Limpieza de buffer de consola para asegurar la pausa
+                    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
+
+                    Console::ForegroundColor = ConsoleColor::Green;
+                    cout << "\n[!] PELICULA CORRECTAMENTE CALIFICADA" << endl;
+                    cout << "Nuevo Rating: " << peli.Puntuacion << " (Guardado con 2 decimales)" << endl;
+                    Console::ForegroundColor = ConsoleColor::White;
+
+                    tecla = _getch();
+                }
+
+            else if (tecla == 'V') { // REPRODUCIR
                 peli.VistasTotales++;
                 TopRecienVistos.InsertarAlInicio(peli);
                 CleanScreen();
                 Console::ForegroundColor = ConsoleColor::Yellow;
                 Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(peli.Titulo.length()) / 2), 1);
                 cout << "<<<" << LimpiarTexto(peli.Titulo) << ">>>";
+
                 Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(peli.Titulo.length()) / 2) + ((int)peli.Titulo.length() + 6 - 30) / 2, 2);
                 Console::ForegroundColor = ConsoleColor::Cyan;
                 cout << "<<<PELICULA REPRODUCIENDOSE>>>" << endl;
-                cout << endl;
+
                 Dibujo();
                 Console::ForegroundColor = ConsoleColor::White;
                 cout << endl << "En reproduccion... Presione cualquier tecla para finalizar";
                 system("pause>0");
-                CleanScreen();
 
-                // Actualizar la lista base
-                for (auto& temp : DatosModificables) {
-                    if (temp.Titulo == peli.Titulo) {
-                        temp.VistasTotales = peli.VistasTotales;
-                        break;
-                    }
+                //actualizar catalogo
+                Nodo<Pelicula<double>>* aux = Catalogo.GetCabeza();
+                if (aux != nullptr) {
+                    do {
+                        if (aux->Dato.Titulo == peli.Titulo) {
+                            aux->Dato.Puntuacion = peli.Puntuacion;
+                            aux->Dato.Volumen = peli.Volumen;
+                            aux->Dato.VistasTotales = peli.VistasTotales;
+                            break;
+                        }
+                        aux = aux->siguiente;
+                    } while (aux != Catalogo.GetCabeza());
                 }
+
+                GuardarDatos();
                 ActualizarTopVistas(peli);
-                break;
+            }
 
-            case 'G':
-            {
-                Nodo<Pelicula<double>>* tempCheck = VerMasTarde.GetCabeza();
-                bool yaGuardada = false;
-
-                while (tempCheck != nullptr) {
-                    if (tempCheck->Dato.Titulo == peli.Titulo) {
-                        yaGuardada = true;
-                        break;
-                    }
-                    tempCheck = tempCheck->siguiente;
-                }
-
+            else if (tecla == 'G') { // GUARDAR
+                // Lógica de guardado simplificada sin switch
                 CleanScreen();
+                bool yaGuardada = false;
+                Nodo<Pelicula<double>>* checkG = VerMasTarde.GetCabeza();
+                if (checkG != nullptr) {
+                    do {
+                        if (checkG->Dato.Titulo == peli.Titulo) { yaGuardada = true; break; }
+                        checkG = checkG->siguiente;
+                    } while (checkG != VerMasTarde.GetCabeza());
+                }
 
                 if (yaGuardada) {
                     Console::ForegroundColor = ConsoleColor::Yellow;
-                    Gotoxy((int)(GetAnchoVentana() / 2) - 20, 1);
-                    cout << "PELICULA YA GUARDADA";
-                    Console::ForegroundColor = ConsoleColor::White;
-                    cout << endl << endl;
-                    cout << "La pelicula '" << LimpiarTexto(peli.Titulo) << "' ya estaba en tu lista 'Ver mas tarde'." << endl;
+                    cout << "LA PELICULA YA ESTA EN TU LISTA." << endl;
                 }
                 else {
                     VerMasTarde.InsertarAlInicio(peli);
                     Console::ForegroundColor = ConsoleColor::Green;
-                    Gotoxy((int)(GetAnchoVentana() / 2) - 25, 1);
-                    cout << "PELICULA GUARDADA PARA VER MAS TARDE";
-                    Console::ForegroundColor = ConsoleColor::White;
-                    cout << endl << endl;
-                    cout << "La pelicula '" << LimpiarTexto(peli.Titulo) << "' ha sido guardada exitosamente." << endl;
+                    cout << "PELICULA GUARDADA EXITOSAMENTE." << endl;
                 }
-
+                Console::ForegroundColor = ConsoleColor::White;
                 system("pause");
-                CleanScreen();
-            }
-            break;
-
-            case 'S': break;
             }
         }
     }

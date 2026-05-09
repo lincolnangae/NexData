@@ -23,6 +23,10 @@ public:
         Puntuacion(punt), Volumen(vol), VistasTotales(visits) {
     }
 
+    int GetOrden() {
+        return Orden;
+    }
+
     void MostrarEnLista() {
         // Lambda para reemplazar el signo - por espacios
         auto limpiarTexto = [](string texto) {
@@ -69,7 +73,7 @@ public:
         setColor(8); cout << "[ "; setColor(12); cout << "S"; setColor(8); cout << " ] Volver";
         setColor(15);
 
-        int posX_Titulo = (anchoV / 2) - (tituloLimpio.length() / 2) - 5;
+        int posX_Titulo = ((int)anchoV / 2) - ((int)tituloLimpio.length() / 2) - 5;
         GotoxSimplified(posX_Titulo, y + 2);
         setColor(11); cout << ">>> ";
         setColor(14); cout << tituloLimpio;
