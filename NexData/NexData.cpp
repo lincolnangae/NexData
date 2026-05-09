@@ -65,19 +65,13 @@ void EjecutarMenu(Gestionador& sistema) {
         }
 
         else if (tecla == 'c' || tecla == 'C') {
-            system("cls");
-            cout << "[ FILTRANDO POR CALIFICACION... ]" << endl;
-            system("pause");
+            sistema.OrdenarYMostrar('C');
         }
         else if (tecla == 'n' || tecla == 'N') {
-            system("cls");
-            cout << "[ FILTRANDO POR ANIO DE LANZAMIENTO... ]" << endl;
-            system("pause");
+            sistema.OrdenarYMostrar('N');
         }
         else if (tecla == 'a' || tecla == 'A') {
-            system("cls");
-            cout << "[ FILTRANDO ALFABETICAMENTE... ]" << endl;
-            system("pause");
+            sistema.OrdenarYMostrar('A');
         }
         else if (tecla == 'g' || tecla == 'G') {
             sistema.GuardarParaVerMasTarde();

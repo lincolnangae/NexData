@@ -1,7 +1,7 @@
 1,The-Matrix,1999,Accion,Ficcion,Suspenso,Aventura,Drama
 2,Forrest-Gump,1994,Comedia,Romance,Familiar,Drama,Historia
 3,El-Silencio-de-los-Inocentes,1991,Terror,Suspenso,Misterio,Drama,Thriller
-4,El-Señor-de-los-Anillos-La-Comunidad-del-Anillo,2001,Accion,Aventura,Fantasia,Ficcion,Drama
+4,El-Senor-de-los-Anillos-La-Comunidad-del-Anillo,2001,Accion,Aventura,Fantasia,Ficcion,Drama
 5,La-Lista-de-Schindler,1993,Drama,Biografia,Historia,Guerra,Romance
 6,The-Truman-Show,1998,Comedia,Drama,Ficcion,Familiar,Satira
 7,Seven,1995,Terror,Suspenso,Misterio,Thriller,Drama
@@ -31,10 +31,10 @@
 31,El-Pianista,2002,Drama,Biografia,Historia,Guerra,Musica
 32,Todo-en-todas-partes-al-mismo-tiempo,2022,Ficcion,Accion,Aventura,Comedia,Fantasia
 33,Shrek,2001,Comedia,Familiar,Animacion,Fantasia,Aventura
-34,Parásitos,2019,Suspenso,Misterio,Thriller,Drama,Comedia
+34,Parasitos,2019,Suspenso,Misterio,Thriller,Drama,Comedia
 35,Gladiador,2000,Accion,Aventura,Drama,Historia,Guerra
 36,Diario-de-una-Pasion,2004,Drama,Romance,Historia,Biografia,Musical
-37,¿Qué-pasó-ayer?,2009,Comedia,Aventura,Familiar,Amistad,Crimen
+37,Que-paso-ayer?,2009,Comedia,Aventura,Familiar,Amistad,Crimen
 38,Fuego-contra-Fuego,1995,Accion,Thriller,Crimen,Suspenso,Drama
 39,El-Conjuro,2013,Terror,Misterio,Suspenso,Thriller,Sobrenatural
 40,Spider-Man-Un-nuevo-universo,2018,Animacion,Aventura,Familiar,Accion,Ficcion
@@ -42,7 +42,7 @@
 42,Oppenheimer,2023,Drama,Historia,Biografia,Guerra,Ficcion
 43,El-Creador,2023,Ficcion,Accion,Aventura,Thriller,Suspenso
 44,Un-Lugar-Llamado-Notting-Hill,1999,Comedia,Romance,Drama,Familiar,Musical
-45,¡Huye!,2017,Terror,Suspenso,Misterio,Thriller,Drama
+45,Huye,2017,Terror,Suspenso,Misterio,Thriller,Drama
 46,Dunkurque,2017,Accion,Aventura,Historia,Guerra,Drama
 47,Whiplash,2014,Drama,Musica,Biografia,Historia,Musical
 48,Buscando-a-Nemo,2003,Animacion,Familiar,Aventura,Comedia,Fantasia

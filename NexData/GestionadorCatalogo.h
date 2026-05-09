@@ -25,7 +25,261 @@ private:
     int TopVistas2;
     int TopVistas3;
 
+    // ----- FUNCIONES DE ORDENAMIENTO ESTÁTICAS -----
+    template <typename T, typename Comparador>
+    static int Particion(vector<T>& arr, int inicio, int fin, Comparador comp) {
+        T pivote = arr[fin]; // Tomamos el último elemento como pivote
+        int i = inicio - 1;
+
+        for (int j = inicio; j <= fin - 1; j++) {
+            // Ejecutamos la función lambda 'comp' para saber si debemos intercambiar
+            if (comp(arr[j], pivote)) {
+                i++;
+                swap(arr[i], arr[j]);
+            }
+        }
+        swap(arr[i + 1], arr[fin]);
+        return i + 1;
+    }
+
+    template <typename T, typename Comparador>
+    static void QuickSortRecursivo(vector<T>& arr, int inicio, int fin, Comparador comp) {
+        if (inicio < fin) {
+            // pi es el índice de partición
+            int pi = Particion(arr, inicio, fin, comp);
+
+            // Llamadas recursivas para la mitad izquierda y derecha
+            QuickSortRecursivo(arr, inicio, pi - 1, comp);
+            QuickSortRecursivo(arr, pi + 1, fin, comp);
+        }
+    }
+
 public:
+    void OrdenarYMostrar(char criterio) {
+        system("cls");
+
+        // 1. Creamos una copia temporal para no alterar el orden original de los TXT si no queremos
+        vector<Pelicula<double>> ListaOrdenada = DatosModificables;
+
+        // 2. Definimos nuestras Lambdas de comparación
+        auto ordenCalificacionDesc = [](const Pelicula<double>& a, const Pelicula<double>& b) {
+            return a.Puntuacion > b.Puntuacion; // Mayor a menor
+        };
+
+        auto ordenAnioDesc = [](const Pelicula<double>& a, const Pelicula<double>& b) {
+            return a.Lanzamiento > b.Lanzamiento; // Más recientes primero
+        };
+
+        auto ordenAlfabeticoAsc = [](const Pelicula<double>& a, const Pelicula<double>& b) {
+            return a.Titulo < b.Titulo; // A - Z
+        };
+
+        // 3. Ejecutamos el QuickSort Recursivo según la opción
+        int n = ListaOrdenada.size();
+        if (n == 0) return;
+
+        Console::ForegroundColor = ConsoleColor::Yellow;
+        switch (toupper(criterio)) {
+        case 'C':
+            QuickSortRecursivo(ListaOrdenada, 0, n - 1, ordenCalificacionDesc);
+            cout << "\n[ CATALOGO ORDENADO POR CALIFICACION (Mayor a Menor) ]\n\n";
+            break;
+        case 'N':
+            QuickSortRecursivo(ListaOrdenada, 0, n - 1, ordenAnioDesc);
+            cout << "\n[ CATALOGO ORDENADO POR ANIO (Mas recientes primero) ]\n\n";
+            break;
+        case 'A':
+            QuickSortRecursivo(ListaOrdenada, 0, n - 1, ordenAlfabeticoAsc);
+            cout << "\n[ CATALOGO ORDENADO ALFABETICAMENTE (A-Z) ]\n\n";
+            break;
+        default:
+            return;
+        }
+        Console::ForegroundColor = ConsoleColor::White;
+
+        // 4. Imprimimos los resultados
+        for (int i = 0; i < n; i++) {
+            ListaOrdenada[i].MostrarEnLista();
+            cout << "---------------------------------" << endl;
+        }
+
+        // 5. Interacción del usuario para ver detalles detallados
+        while (true) {
+            cout << "\nPresiona el numero [ID] de la pelicula para ver detalles (o 0 para salir): ";
+            int seleccion;
+            cin >> seleccion;
+
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore((numeric_limits<streamsize>::max)(), '\n');
+                cout << "Entrada invalida. Por favor, ingresa un numero." << endl;
+                continue;
+            }
+
+            if (seleccion == 0) {
+                break; // El usuario quiere regresar al menú principal
+            }
+
+            // Buscar la película con ese ID (Orden) en nuestra lista ordenada
+            bool encontrada = false;
+            for (int i = 0; i < n; i++) {
+                if (ListaOrdenada[i].Orden == seleccion) {
+                    encontrada = true;
+                    // Mostrar la película seleccionada usando una función similar a ImprimirInformacion
+                    ImprimirInformacionDesdePelicula(ListaOrdenada[i]);
+
+                    // Volver a imprimir la lista después de ver los detalles para que el usuario no se pierda
+                    system("cls");
+                    Console::ForegroundColor = ConsoleColor::Yellow;
+                    cout << "\n[ CATALOGO ORDENADO RECIENTEMENTE VISTO ]\n\n";
+                    Console::ForegroundColor = ConsoleColor::White;
+                    for (int j = 0; j < n; j++) {
+                        ListaOrdenada[j].MostrarEnLista();
+                        cout << "---------------------------------" << endl;
+                    }
+                    break;
+                }
+            }
+
+            if (!encontrada) {
+                cout << "No se encontro ninguna pelicula con ese ID en esta lista." << endl;
+            }
+        }
+    }
+
+    // Sobrecarga de ImprimirInformacion para poder llamarla pasándole el objeto directamente
+    void ImprimirInformacionDesdePelicula(Pelicula<double>& peli) {
+        auto CambiarMayuscula = [](char c) {
+            return toupper(c);
+        };
+        auto LimpiarTexto = [](string texto) {
+            for (char& c : texto) {
+                if (c == '-') c = ' ';
+            }
+            return texto;
+        };
+        auto CleanScreen = []() {
+            system("cls");
+        };
+
+        CleanScreen();
+        char tecla = ' ';
+
+        while (tecla != 'S') {
+            // Verificar si la película está guardada
+            Nodo<Pelicula<double>>* tempCheck = VerMasTarde.GetCabeza();
+            bool estaGuardada = false;
+
+            while (tempCheck != nullptr) {
+                if (tempCheck->Dato.Titulo == peli.Titulo) {
+                    estaGuardada = true;
+                    break;
+                }
+                tempCheck = tempCheck->siguiente;
+            }
+
+            peli.ImprimirInfoExtendida(1, estaGuardada);
+            tecla = CambiarMayuscula(_getch());
+
+            switch (tecla) {
+            case 'C':
+                CleanScreen();
+                Console::ForegroundColor = ConsoleColor::Yellow;
+                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(peli.Titulo.length()) / 2), 1);
+                cout << "<<CALIFICAR PELICULA>>";
+                Console::ForegroundColor = ConsoleColor::White;
+                cout << endl;
+
+                double ValueRatingTemp;
+                do {
+                    cout << "Introduce una calificacion [0-10]: ";
+                    cin >> ValueRatingTemp;
+
+                    if (cin.fail()) {
+                        cin.clear();
+                        cin.ignore((numeric_limits<streamsize>::max)(), '\n');
+                        cout << "Error: No se permiten letras o simbolos." << endl;
+                        ValueRatingTemp = -1;
+                        continue;
+                    }
+
+                    if (ValueRatingTemp < 0 || ValueRatingTemp > 10) {
+                        cout << "Rango invalido. Intenta de nuevo." << endl;
+                        cout << endl;
+                    }
+                } while (ValueRatingTemp < 0 || ValueRatingTemp > 10);
+                CleanScreen();
+                break;
+
+            case 'V':
+                peli.VistasTotales++;
+                TopRecienVistos.InsertarAlInicio(peli);
+                CleanScreen();
+                Console::ForegroundColor = ConsoleColor::Yellow;
+                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(peli.Titulo.length()) / 2), 1);
+                cout << "<<<" << LimpiarTexto(peli.Titulo) << ">>>";
+                Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(peli.Titulo.length()) / 2) + ((int)peli.Titulo.length() + 6 - 30) / 2, 2);
+                Console::ForegroundColor = ConsoleColor::Cyan;
+                cout << "<<<PELICULA REPRODUCIENDOSE>>>" << endl;
+                cout << endl;
+                Dibujo();
+                Console::ForegroundColor = ConsoleColor::White;
+                cout << endl << "En reproduccion... Presione cualquier tecla para finalizar";
+                system("pause>0");
+                CleanScreen();
+
+                // Actualizar la lista base
+                for (auto& temp : DatosModificables) {
+                    if (temp.Titulo == peli.Titulo) {
+                        temp.VistasTotales = peli.VistasTotales;
+                        break;
+                    }
+                }
+                ActualizarTopVistas(peli);
+                break;
+
+            case 'G':
+            {
+                Nodo<Pelicula<double>>* tempCheck = VerMasTarde.GetCabeza();
+                bool yaGuardada = false;
+
+                while (tempCheck != nullptr) {
+                    if (tempCheck->Dato.Titulo == peli.Titulo) {
+                        yaGuardada = true;
+                        break;
+                    }
+                    tempCheck = tempCheck->siguiente;
+                }
+
+                CleanScreen();
+
+                if (yaGuardada) {
+                    Console::ForegroundColor = ConsoleColor::Yellow;
+                    Gotoxy((int)(GetAnchoVentana() / 2) - 20, 1);
+                    cout << "PELICULA YA GUARDADA";
+                    Console::ForegroundColor = ConsoleColor::White;
+                    cout << endl << endl;
+                    cout << "La pelicula '" << LimpiarTexto(peli.Titulo) << "' ya estaba en tu lista 'Ver mas tarde'." << endl;
+                }
+                else {
+                    VerMasTarde.InsertarAlInicio(peli);
+                    Console::ForegroundColor = ConsoleColor::Green;
+                    Gotoxy((int)(GetAnchoVentana() / 2) - 25, 1);
+                    cout << "PELICULA GUARDADA PARA VER MAS TARDE";
+                    Console::ForegroundColor = ConsoleColor::White;
+                    cout << endl << endl;
+                    cout << "La pelicula '" << LimpiarTexto(peli.Titulo) << "' ha sido guardada exitosamente." << endl;
+                }
+
+                system("pause");
+                CleanScreen();
+            }
+            break;
+
+            case 'S': break;
+            }
+        }
+    }
 
     Gestionador() : VerMasTarde(1000) {  // Capacidad de 1000 películas en "Ver más tarde"
         TopVistas1 = 0;
