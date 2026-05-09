@@ -12,6 +12,9 @@ private:
 public:
     ListaCircularDoble() : cabeza(nullptr), cantidad(0) {}
 
+    Nodo<T>* GetCabeza() { return cabeza; }
+    int GetCantidad() { return cantidad; }
+
     void InsertarAlFinal(T dato) {
 
         if (cabeza != nullptr) {
@@ -34,6 +37,19 @@ public:
             cabeza->anterior = nuevo;
         }
         cantidad++;
+    }
+
+    void InsertarAlInicio(T dato) {
+
+        if (cabeza != nullptr) {
+            if (dato.Titulo == cabeza->Dato.Titulo) {
+                return;
+            }
+        }
+
+        InsertarAlFinal(dato);
+
+        cabeza = cabeza->anterior;
     }
 
     void InsertarEnPosicion(int indx, T dato) {

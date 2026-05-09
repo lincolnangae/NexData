@@ -10,11 +10,12 @@ class Gestionador {
 private:
 
     ListaCircularDoble<Pelicula<double>> Catalogo;
+    ListaCircularDoble<Pelicula<double>> VerMasTarde; //Los recientes vistos
     vector<Pelicula<double>> DatosModificables; //Lista para actualizar "DirectorioDatos.txt"
     ListaSimple<Pelicula<double>> TopMasVistos; //Los Mas Vistos
     ListaSimple<Pelicula<double>> TopRecientes; //Los ultimos de la lista
     ListaSimple<Pelicula<double>> TopRecienVistos; //Los ultimos de la lista
-    ListaSimple<Pelicula<double>> VerMasTarde;  // Nueva lista para 'ver mas tarde'
+
 
     //Vistas Referenciales
     Pelicula<double> Top1;
@@ -27,7 +28,7 @@ private:
 
 public:
 
-    Gestionador() : VerMasTarde(1000) {  // Capacidad de 1000 películas en "Ver más tarde"
+    Gestionador() {  // Capacidad de 1000 películas en "Ver más tarde"
         TopVistas1 = 0;
         TopVistas2 = 0;
         TopVistas3 = 0;
@@ -35,7 +36,7 @@ public:
     ~Gestionador() {
         DatosModificables.clear();
     }
-    void cargarDesdeArchivos() {
+    void CargarDesdeArchivos() {
         //Nombre de Ruta
         String^ rutaPelis = "DirectorioPeliculas.txt";
         String^ rutaDatos = "DirectorioDatos.txt";
@@ -87,12 +88,6 @@ public:
                 cout << "Error critico al procesar los datos: " << marshal_as<string>(ex->Message) << endl;
             }
             finally {
-                if (TopVistas1 > 0) {
-                    //al final de el while y despues de comparar, recien ubicamos las peliculas
-                    TopMasVistos.InsertarAlInicio(Top3);
-                    TopMasVistos.InsertarAlInicio(Top2);
-                    TopMasVistos.InsertarAlInicio(Top1);
-                }
                 lectorPelis->Close();
                 lectorDatos->Close();
             }
@@ -122,34 +117,50 @@ public:
     }
 
     void ActualizarTopVistas(Pelicula<double> p) {
-        bool huboCambio = 0;
-        if (p.VistasTotales > TopVistas1) {
-            Top3 = Top2; TopVistas3 = TopVistas2;
-            Top2 = Top1; TopVistas2 = TopVistas1;
+        //verificar si ya existe para no cambiar
+        if (p.Titulo == Top1.Titulo) {
             Top1 = p; TopVistas1 = p.VistasTotales;
-            huboCambio = 1;
         }
-        else if (p.VistasTotales > TopVistas2) {
-            Top3 = Top2; TopVistas3 = TopVistas2;
+        else if (p.Titulo == Top2.Titulo) {
             Top2 = p; TopVistas2 = p.VistasTotales;
-            huboCambio = 1;
-
-
         }
-        else if (p.VistasTotales > TopVistas3) {
+        else if (p.Titulo == Top3.Titulo) {
             Top3 = p; TopVistas3 = p.VistasTotales;
-            huboCambio = 1;
+        }
+        else {
+            //si es nueva, la logica normal
+            if (p.VistasTotales > TopVistas1) {
+                Top3 = Top2; TopVistas3 = TopVistas2;
+                Top2 = Top1; TopVistas2 = TopVistas1;
+                Top1 = p; TopVistas1 = p.VistasTotales;
+            }
+            else if (p.VistasTotales > TopVistas2) {
+                Top3 = Top2; TopVistas3 = TopVistas2;
+                Top2 = p; TopVistas2 = p.VistasTotales;
+            }
+            else if (p.VistasTotales > TopVistas3) {
+                Top3 = p; TopVistas3 = p.VistasTotales;
+            }
         }
 
-        if (huboCambio = 1) {
-            TopMasVistos = ListaSimple<Pelicula<double>>(3);
-            TopMasVistos.InsertarAlInicio(Top3);
-            TopMasVistos.InsertarAlInicio(Top2);
-            TopMasVistos.InsertarAlInicio(Top1);
+        // reordenar si hubo subimiento
+        if (TopVistas2 > TopVistas1) {
+            swap(Top1, Top2); swap(TopVistas1, TopVistas2);
         }
+        if (TopVistas3 > TopVistas2) {
+            swap(Top2, Top3); swap(TopVistas2, TopVistas3);
+        }
+        if (TopVistas2 > TopVistas1) {
+            swap(Top1, Top2); swap(TopVistas1, TopVistas2);
+        }
+
+        TopMasVistos = ListaSimple<Pelicula<double>>(3);
+        if (TopVistas3 > 0) TopMasVistos.InsertarAlInicio(Top3);
+        if (TopVistas2 > 0) TopMasVistos.InsertarAlInicio(Top2);
+        if (TopVistas1 > 0) TopMasVistos.InsertarAlInicio(Top1);
     }
 
-    void MostrarTops(TipoTop tipo) {
+    void MostrarTopMenus(TipoTop tipo) {
         Nodo<Pelicula<double>>* actual = nullptr;
         int indice = 0;
 
@@ -351,281 +362,354 @@ public:
     }
 
     void GuardarParaVerMasTarde() {
-        system("cls");
-        auto CleanScreen = []() {
-            system("cls");
-        };
-        auto LimpiarTexto = [](string texto) {
-            for (char& c : texto) {
-                if (c == '-') c = ' ';
+        if (Catalogo.GetCantidad() == 0) {
+            return;
+        }
+
+        auto DibujarSeparador = [this]() {
+            for (int j = 0; j < 40; j++) {
+                setColor(j % 4);
+                cout << char(178);
             }
+            setColor(15);
+            cout << endl;
+            };
+
+        ListaCircularDoble<Pelicula<double>> listaNavegacion;
+        Nodo<Pelicula<double>>* actualCat = Catalogo.GetCabeza();
+
+        if (actualCat != nullptr) {
+            do {
+                listaNavegacion.InsertarAlFinal(actualCat->Dato);
+                actualCat = actualCat->siguiente;
+            } while (actualCat != Catalogo.GetCabeza());
+        }
+
+        auto CleanScreen = []() { system("cls"); };
+        auto LimpiarTexto = [](string texto) {
+            for (char& c : texto) if (c == '-') c = ' ';
             return texto;
-        };
+            };
 
-        Console::ForegroundColor = ConsoleColor::Yellow;
-        cout << "\n======== AGREGAR A 'VER MAS TARDE' ========\n" << endl;
-        Console::ForegroundColor = ConsoleColor::White;
+        Nodo<Pelicula<double>>* inicioVentana = listaNavegacion.GetCabeza();
+        char tecla = ' ';
 
-        int totalPeliculas = ContarPeliculasEnCatalogo();
-        if (totalPeliculas == 0) {
+        while (tecla != '0') {
+            CleanScreen();
+            Console::ForegroundColor = ConsoleColor::Yellow;
+            Gotoxy(GetAnchoVentana() / 2 - 20, 0); cout << "========================================" << endl;
+            Gotoxy(GetAnchoVentana() / 2 - 20, 1); cout << "        LISTADO - DE - PELICULAS        " << endl;
+            Gotoxy(GetAnchoVentana() / 2 - 20, 2); cout << "========================================" << endl;
+            Console::ForegroundColor = ConsoleColor::Cyan;
+            cout << "------------------------------------------------------------------" << endl;
+            cout << "[Q] Anterior  |  [E] Siguiente  |  [1-9] Seleccionar  |  [0] Salir" << endl;
+            cout << "------------------------------------------------------------------" << endl;
+            cout << "Seleccionar una pelicula segun indice [1 - 9]" << endl;
+            cout << endl;
+            Console::ForegroundColor = ConsoleColor::White;
+
+            //mostrar 9 peliculas
+            Nodo<Pelicula<double>>* temp = inicioVentana;
+            int limite = (listaNavegacion.GetCantidad() < 9) ? listaNavegacion.GetCantidad() : 9;
+
+            for (int i = 1; i <= limite; i++) {
+                Console::ForegroundColor = ConsoleColor::Gray;
+                cout << "[" << i << "] ";
+                Console::ForegroundColor = ConsoleColor::White;
+                // Llamada al método de la clase Pelicula
+                temp->Dato.MostrarEnLista();
+                Console::ForegroundColor = ConsoleColor::DarkGray;
+                cout << "----------------------------------------------------------" << endl;
+                Console::ForegroundColor = ConsoleColor::White;
+                DibujarSeparador();
+                temp = temp->siguiente;
+            }
+
+            tecla = toupper(_getch());
+
+            // navegacion de toda la lista
+            if (tecla == 'E') {
+                inicioVentana = inicioVentana->siguiente;
+            }
+            else if (tecla == 'Q') {
+                inicioVentana = inicioVentana->anterior;
+            }
+            //seleccion de pelicula
+            else if (tecla >= '1' && tecla <= '9') {
+                int seleccion = tecla - '0';
+                if (seleccion <= limite) {
+                    Nodo<Pelicula<double>>* nodoElegido = inicioVentana;
+                    for (int k = 1; k < seleccion; k++) {
+                        nodoElegido = nodoElegido->siguiente;
+                    }
+                    // logica de guardado en ListaSimple
+                    VerMasTarde.InsertarAlInicio(nodoElegido->Dato);
+
+                    Console::ForegroundColor = ConsoleColor::Green;
+                    cout << "\n>> '" << LimpiarTexto(nodoElegido->Dato.Titulo) << "' agregada exitosamente." << endl;
+                    Console::ForegroundColor = ConsoleColor::White;
+                    system("pause");
+                }
+            }
+        }
+    }
+
+    void VerListaVerMasTarde() {
+        if (VerMasTarde.GetCantidad() == 0) {
+            system("cls");
             Console::ForegroundColor = ConsoleColor::Red;
-            cout << "No hay peliculas en el catalogo." << endl;
+            cout << "\nTu lista 'Ver mas tarde' esta vacia." << endl;
             Console::ForegroundColor = ConsoleColor::White;
             system("pause");
             return;
         }
 
-        // Mostrar todas las películas del catálogo desde DatosModificables
-        cout << "\n[ PELICULAS DISPONIBLES ]\n" << endl;
-        for (int i = 0; i < totalPeliculas; i++) {
-            cout << (i + 1) << ". ";
-            DatosModificables[i].MostrarEnLista();
-            cout << endl;
-        }
+        bool enMenu = true;
+        Nodo<Pelicula<double>>* inicioVentana = VerMasTarde.GetCabeza();
 
-        char continuar = 'S';
-        while (continuar == 'S' || continuar == 's') {
-            int numPeli;
-            cout << "\nIngresa el numero de pelicula a guardar (0 para terminar): ";
-            cin >> numPeli;
-
-            if (cin.fail()) {
-                cin.clear();
-                cin.ignore((numeric_limits<streamsize>::max)(), '\n');
-                Console::ForegroundColor = ConsoleColor::Red;
-                cout << "Error: Debes ingresar un numero." << endl;
-                Console::ForegroundColor = ConsoleColor::White;
-                continue;
-            }
-
-            if (numPeli == 0) break;
-
-            if (numPeli < 1 || numPeli > totalPeliculas) {
-                Console::ForegroundColor = ConsoleColor::Red;
-                cout << "Numero invalido. Intenta de nuevo." << endl;
-                Console::ForegroundColor = ConsoleColor::White;
-                continue;
-            }
-
-            // Obtener la película del catálogo y agregarla a VerMasTarde
-            Pelicula<double> peliSeleccionada = ObtenerPeliculaPorIndice(numPeli);
-            VerMasTarde.InsertarAlInicio(peliSeleccionada);
-
-            Console::ForegroundColor = ConsoleColor::Green;
-            cout << "Pelicula '" << LimpiarTexto(peliSeleccionada.Titulo) << "' guardada para ver mas tarde." << endl;
-            Console::ForegroundColor = ConsoleColor::White;
-
-            cout << "Agregar otra? (S/N): ";
-            continuar = _getch();
-        }
-
-        CleanScreen();
-        Console::ForegroundColor = ConsoleColor::Green;
-        cout << "Peliculas guardadas exitosamente." << endl;
-        Console::ForegroundColor = ConsoleColor::White;
-        system("pause");
-    }
-
-    void VerListaVerMasTarde() {
-        bool enMenuVerMasTarde = true;
-
-        while (enMenuVerMasTarde) {
+        while (enMenu) {
             system("cls");
             Console::ForegroundColor = ConsoleColor::Yellow;
-            cout << "\n======== LISTA 'VER MAS TARDE' ========\n" << endl;
+            Gotoxy(GetAnchoVentana() / 2 - 20, 0); cout << "========================================" << endl;
+            Gotoxy(GetAnchoVentana() / 2 - 20, 1); cout << "      LISTADO - DE - VER - DESPUES      " << endl;
+            Gotoxy(GetAnchoVentana() / 2 - 20, 2); cout << "========================================" << endl;
+
+            Console::ForegroundColor = ConsoleColor::Cyan;
+            cout << "------------------------------------------------------------------" << endl;
+            cout << "[Q] Anterior | [E] Siguiente | [S] Reordenar | [0] Salir" << endl;
+            cout << "------------------------------------------------------------------" << endl;
             Console::ForegroundColor = ConsoleColor::White;
 
-            Nodo<Pelicula<double>>* actual = VerMasTarde.GetCabeza();
-            if (actual == nullptr) {
-                Console::ForegroundColor = ConsoleColor::Red;
-                cout << "La lista esta vacia." << endl;
+            Nodo<Pelicula<double>>* temp = inicioVentana;
+            int total = VerMasTarde.GetCantidad();
+            int limite = (total < 9) ? total : 9;
+
+            for (int i = 1; i <= limite; i++) {
+                Console::ForegroundColor = ConsoleColor::Gray;
+                cout << "[" << i << "] ";
                 Console::ForegroundColor = ConsoleColor::White;
-                system("pause");
-                return;
+                temp->Dato.MostrarEnLista();
+                Console::ForegroundColor = ConsoleColor::DarkGray;
+                cout << "----------------------------------------------------------" << endl;
+                temp = temp->siguiente;
             }
 
-            int totalPelis = 0;
-            int indice = 1;
-            while (actual != nullptr) {
-                cout << indice << ". ";
-                actual->Dato.MostrarEnLista();
-                actual = actual->siguiente;
-                indice++;
-                totalPelis++;
-                cout << endl;
+            char tecla = toupper(_getch());
+
+            if (tecla == 'E') {
+                inicioVentana = inicioVentana->siguiente;
             }
-
-            cout << "\n¿Deseas reordenar? (S/N): ";
-            char opcion = toupper(_getch());
-
-            if (opcion == 'N') {
-                enMenuVerMasTarde = false;
+            else if (tecla == 'Q') {
+                inicioVentana = inicioVentana->anterior;
             }
-            else if (opcion == 'S') {
-                int peliculaActual, posicionNueva;
-                cout << "\n¿Que pelicula deseas mover? (numero): "; cin >> peliculaActual;
-                cout << "¿A que posicion? (numero): "; cin >> posicionNueva;
+            else if (tecla == '0') {
+                enMenu = false;
+            }
+            else if (tecla == 'S') {
+                int peliIndex, posNueva;
+                cout << "\nIndice de pelicula a mover (1-" << total << "): "; cin >> peliIndex;
+                cout << "Nueva posicion (1-" << total << "): "; cin >> posNueva;
 
-                if (cin.fail() || peliculaActual < 1 || peliculaActual > totalPelis || posicionNueva < 1 || posicionNueva > totalPelis) {
-                    cin.clear();
-                    cin.ignore((numeric_limits<streamsize>::max)(), '\n');
-                    cout << "Seleccion invalida." << endl;
-                    system("pause");
+                if (cin.fail() || peliIndex < 1 || peliIndex > total || posNueva < 1 || posNueva > total) {
+                    cin.clear(); cin.ignore(1000, '\n');
+                    cout << "Entrada invalida." << endl; system("pause");
                     continue;
                 }
 
-                ListaCircularDoble<Pelicula<double>> listaTemporal;
-                actual = VerMasTarde.GetCabeza();
-                Pelicula<double> peliAMover;
-                int contador = 1;
+                //extraer el dato
+                Nodo<Pelicula<double>>* aux = VerMasTarde.GetCabeza();
+                for (int i = 1; i < peliIndex; i++) aux = aux->siguiente;
+                Pelicula<double> peliExtraida = aux->Dato;
 
-                // Extraer datos a la lista temporal omitiendo la película a mover
-                while (actual != nullptr) {
-                    if (contador == peliculaActual) {
-                        peliAMover = actual->Dato;
-                    }
-                    else {
-                        listaTemporal.InsertarAlFinal(actual->Dato);
-                    }
-                    actual = actual->siguiente;
-                    contador++;
+                //temporal para evitar corromper la lista principal
+                ListaCircularDoble<Pelicula<double>> nuevaLista;
+                Nodo<Pelicula<double>>* it = VerMasTarde.GetCabeza();
+                for (int i = 1; i <= total; i++) {
+                    if (i != peliIndex) nuevaLista.InsertarAlFinal(it->Dato);
+                    it = it->siguiente;
                 }
 
-                // Insertar en la nueva posición dentro de la lista temporal
-                listaTemporal.InsertarEnPosicion(posicionNueva, peliAMover);
+                //Insertar en la nueva posición
+                nuevaLista.InsertarEnPosicion(posNueva, peliExtraida);
 
-                // Reconstruir la ListaSimple original (VerMasTarde)
-                VerMasTarde = ListaSimple<Pelicula<double>>(121);
+                VerMasTarde = nuevaLista;
 
-                cout << "\nLista reordenada exitosamente." << endl;
+                Console::ForegroundColor = ConsoleColor::Green;
+                cout << "\nReordenado correctamente." << endl;
+                Console::ForegroundColor = ConsoleColor::White;
                 system("pause");
+                inicioVentana = VerMasTarde.GetCabeza();
             }
         }
     }
     
-    // FUNCION DE ORDENAMIENTO QUICK SHORT - PARA 3 CATEGORIAS
-    template <typename T, typename Comparador>
-    static int Particion(vector<T>& arr, int inicio, int fin, Comparador comp) {
-        // Tomamos el último elemento como pivote
-        T pivote = arr[fin];
-        int i = inicio - 1;
+    //==============LOGICA PURA PARA OPERARR SOBRE LAS LISTAS DOBLES
+    // Ahora recibe una referencia a la lista que queremos ver
+    void MostrarCatalogoPaginado(ListaCircularDoble<Pelicula<double>>& listaAMostrar) {
 
-        for (int j = inicio; j <= fin - 1; j++) {
-            // Ejecutamos la función lambda 'comp' para saber si debemos intercambiar
-            if (comp(arr[j], pivote)) {
-                i++;
-                swap(arr[i], arr[j]);
+        auto CleanScreen = []() { system("cls"); };
+
+        auto LimpiarTexto = [](string texto) {
+            for (char& c : texto) if (c == '-') c = ' ';
+            return texto;
+            };
+
+        auto DibujarSeparador = [this]() {
+            for (int j = 0; j < 40; j++) {
+                setColor(j % 4);
+                cout << char(178);
             }
-        }
-        swap(arr[i + 1], arr[fin]);
-        return i + 1;
-    }
-
-    //Metodo de particion
-    template <typename T, typename Comparador>
-    static void QuickSortRecursivo(vector<T>& arr, int inicio, int fin, Comparador comp) {
-        if (inicio < fin) {
-            // pi es el índice de partición
-            int pi = Particion(arr, inicio, fin, comp);
-
-            // Llamadas recursivas para la mitad izquierda y derecha
-            QuickSortRecursivo(arr, inicio, pi - 1, comp);
-            QuickSortRecursivo(arr, pi + 1, fin, comp);
-        }
-    }
-
-    //Ordenamos nuestra lista peliculas segun categoria 
-    void OrdenarYMostrar(char criterio) {
-        system("cls");
-
-        //Creamos una copia temporal para no alterar el orden original de los TXT
-        vector<Pelicula<double>> ListaOrdenada = DatosModificables;
-
-        //Definimos nuestras Lambdas de comparación
-        auto ordenCalificacionDesc = [](const Pelicula<double>& a, const Pelicula<double>& b) {
-            return a.Puntuacion > b.Puntuacion; // Mayor a menor
+            setColor(15);
+            cout << endl;
             };
 
-        auto ordenAnioDesc = [](const Pelicula<double>& a, const Pelicula<double>& b) {
-            return a.Lanzamiento > b.Lanzamiento; // Más recientes primero
-            };
-
-        auto ordenAlfabeticoAsc = [](const Pelicula<double>& a, const Pelicula<double>& b) {
-            return a.Titulo < b.Titulo; // A - Z
-            };
-
-        //Ejecutamos el QuickSort Recursivo según la opción
-        const int n = ContarPeliculasEnCatalogo();
-        if (n == 0) return;
-
-        Console::ForegroundColor = ConsoleColor::Yellow;
-        switch (toupper(criterio)) {
-        case 'C':
-            QuickSortRecursivo(ListaOrdenada, 0, n - 1, ordenCalificacionDesc);
-            cout << "\n[ CATALOGO ORDENADO POR CALIFICACION (Mayor a Menor) ]\n\n";
-            break;
-        case 'N':
-            QuickSortRecursivo(ListaOrdenada, 0, n - 1, ordenAnioDesc);
-            cout << "\n[ CATALOGO ORDENADO POR ANIO (Mas recientes primero) ]\n\n";
-            break;
-        case 'A':
-            QuickSortRecursivo(ListaOrdenada, 0, n - 1, ordenAlfabeticoAsc);
-            cout << "\n[ CATALOGO ORDENADO ALFABETICAMENTE (A-Z) ]\n\n";
-            break;
-        default:
+        // Verificación inicial
+        if (listaAMostrar.GetCantidad() == 0) {
+            cout << "El catalogo esta vacio." << endl;
+            system("pause");
             return;
         }
-        Console::ForegroundColor = ConsoleColor::White;
 
-        //Imprimimos los resultados
-        for (int i = 0; i < n; i++) {
-            ListaOrdenada[i].MostrarEnLista();
-            cout << "---------------------------------" << endl;
-        }
+        // Puntero que controla el inicio de nuestra "ventana" de visualización
+        Nodo<Pelicula<double>>* inicioVentana = listaAMostrar.GetCabeza();
+        char tecla = ' ';
 
-        //Interacción del usuario para ver detalles detallados
-        while (true) {
-            cout << "\nPresiona el numero [ID] de la pelicula para ver detalles (o 0 para salir): ";
-            int seleccion;
-            cin >> seleccion;
+        while (tecla != '0') {
+            CleanScreen();
 
-            if (cin.fail()) {
-                cin.clear();
-                cin.ignore((numeric_limits<streamsize>::max)(), '\n');
-                cout << "Entrada invalida. Por favor, ingresa un numero." << endl;
-                continue;
+            CleanScreen();
+            Console::ForegroundColor = ConsoleColor::Yellow;
+            Gotoxy(GetAnchoVentana() / 2 - 20, 0); cout << "========================================" << endl;
+            Gotoxy(GetAnchoVentana() / 2 - 20, 1); cout << "             LISTA - CATALOGADO         " << endl;
+            Gotoxy(GetAnchoVentana() / 2 - 20, 2); cout << "========================================" << endl;
+
+            Console::ForegroundColor = ConsoleColor::Cyan;
+            cout << "\n------------------------------------------------------------------" << endl;
+            cout << "[Q] Anterior  |  [E] Siguiente  |  [1-9] Detalle  |  [0] Salir" << endl;
+            cout << "------------------------------------------------------------------" << endl;
+            cout << "Seleccionar una pelicula segun indice [1 - 9]" << endl;
+            Console::ForegroundColor = ConsoleColor::White;
+            cout << endl;
+
+            // Renderizado de la ventana: Máximo 9 películas para coincidir con teclas 1-9
+            Nodo<Pelicula<double>>* temp = inicioVentana;
+            int limite = (listaAMostrar.GetCantidad() < 9) ? listaAMostrar.GetCantidad() : 9;
+
+            for (int i = 1; i <= limite; i++) {
+                Console::ForegroundColor = ConsoleColor::Gray;
+                cout << "[" << i << "] ";
+                Console::ForegroundColor = ConsoleColor::White;
+                // Llamada al método de la clase Pelicula
+                temp->Dato.MostrarEnLista();
+                Console::ForegroundColor = ConsoleColor::DarkGray;
+                cout << "----------------------------------------------------------" << endl;
+                Console::ForegroundColor = ConsoleColor::White;
+                DibujarSeparador();
+                temp = temp->siguiente;
             }
 
-            if (seleccion == 0) {
-                // El usuario quiere regresar al menú principal
-                break; 
+            tecla = toupper(_getch());
+
+            //ir hacia atras
+            if (tecla == 'E') {
+                inicioVentana = inicioVentana->siguiente;
+            }
+            //ir hacia atras
+            else if (tecla == 'Q') {
+                inicioVentana = inicioVentana->anterior;
             }
 
-            // Buscar la película con ese orden
-            bool encontrada = false;
-            for (int i = 0; i < n; i++) {
-                if (ListaOrdenada[i].Orden == seleccion) {
-                    encontrada = true;
-                    // Mostrar la película seleccionada usando una función similar a ImprimirInformacion
-                    ImprimirInformacionDesdePelicula(ListaOrdenada[i]);
+            else if (tecla >= '1' && tecla <= '9') {
+                int seleccion = tecla - '0';
+                if (seleccion <= limite) {
+                    Nodo<Pelicula<double>>* nodoElegido = inicioVentana;
+                    for (int k = 1; k < seleccion; k++) nodoElegido = nodoElegido->siguiente;
 
-                    // Volver a imprimir la lista después de ver los detalles para que el usuario no se pierda
-                    system("cls");
-                    Console::ForegroundColor = ConsoleColor::Yellow;
-                    cout << "\n[ CATALOGO ORDENADO RECIENTEMENTE VISTO ]\n\n";
-                    Console::ForegroundColor = ConsoleColor::White;
-                    for (int j = 0; j < n; j++) {
-                        ListaOrdenada[j].MostrarEnLista();
-                        cout << "---------------------------------" << endl;
-                    }
-                    break;
+                    ImprimirInformacionDesdePelicula(nodoElegido->Dato);
                 }
             }
+        }
+    }
+    // Método auxiliar para intercambiar los datos de dos nodos
+    void Intercambiar(Nodo<Pelicula<double>>* a, Nodo<Pelicula<double>>* b) {
+        Pelicula<double> temp = a->Dato;
+        a->Dato = b->Dato;
+        b->Dato = temp;
+    }
+    // Partición para la Lista Doble Circular
+    template <typename Comparador>
+    Nodo<Pelicula<double>>* ParticionLista(Nodo<Pelicula<double>>* bajo, Nodo<Pelicula<double>>* alto, Comparador comp) {
+        Pelicula<double> pivote = alto->Dato;
+        Nodo<Pelicula<double>>* i = bajo->anterior;
 
-            if (!encontrada) {
-                cout << "No se encontro ninguna pelicula con ese ID en esta lista." << endl;
+        for (Nodo<Pelicula<double>>* j = bajo; j != alto; j = j->siguiente) {
+            if (comp(j->Dato, pivote)) {
+
+                i = (i == bajo->anterior) ? bajo : i->siguiente;
+                Intercambiar(i, j);
             }
         }
+        i = (i == bajo->anterior) ? bajo : i->siguiente;
+        Intercambiar(i, alto);
+        return i;
+    }
+
+    // QuickSort Recursivo para Listas
+    template <typename Comparador>
+    void QuickSortRecursivoLista(Nodo<Pelicula<double>>* bajo, Nodo<Pelicula<double>>* alto, Comparador comp) {
+        if (bajo == nullptr || alto == nullptr || bajo == alto) {
+            return;
+        }
+        Nodo<Pelicula<double>>* p = ParticionLista(bajo, alto, comp);
+        if (p != bajo) {
+            QuickSortRecursivoLista(bajo, p->anterior, comp);
+        }
+        if (p != alto) {
+            QuickSortRecursivoLista(p->siguiente, alto, comp);
+        }
+    }
+
+
+    //ordena la lista segun un parametro en especifico
+    void OrdenarYMostrar(char criterio) {
+        if (Catalogo.GetCantidad() == 0) return;
+
+        ListaCircularDoble<Pelicula<double>> listaTemporal;
+        Nodo<Pelicula<double>>* actual = Catalogo.GetCabeza();
+
+        // Recorremos la circular y copiamos los datos a la nueva lista
+        if (actual != nullptr) {
+            do {
+                listaTemporal.InsertarAlFinal(actual->Dato);
+                actual = actual->siguiente;
+            } while (actual != Catalogo.GetCabeza());
+        }
+
+        //Definir comparadores y rangos para la lista temporal
+        auto ordenCalificacionDesc = [](const Pelicula<double>& a, const Pelicula<double>& b) {
+            return a.Puntuacion > b.Puntuacion;
+            };
+        auto ordenAnioDesc = [](const Pelicula<double>& a, const Pelicula<double>& b) {
+            return a.Lanzamiento > b.Lanzamiento;
+            };
+        auto ordenAlfabeticoAsc = [](const Pelicula<double>& a, const Pelicula<double>& b) {
+            return a.Titulo < b.Titulo;
+            };
+
+
+        Nodo<Pelicula<double>>* bajo = listaTemporal.GetCabeza();
+        Nodo<Pelicula<double>>* alto = bajo->anterior;
+
+        // PASO 3: Ordenar la copia, no el original
+        switch (toupper(criterio)) {
+        case 'C': QuickSortRecursivoLista(bajo, alto, ordenCalificacionDesc); break;
+        case 'N': QuickSortRecursivoLista(bajo, alto, ordenAnioDesc); break;
+        case 'A': QuickSortRecursivoLista(bajo, alto, ordenAlfabeticoAsc); break;
+        default: return;
+        }
+
+        //Mostrar la lista temporal
+        MostrarCatalogoPaginado(listaTemporal);
     }
 
     //menu mostraro al elegir una pelicula

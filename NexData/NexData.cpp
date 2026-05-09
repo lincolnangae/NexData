@@ -20,22 +20,22 @@ void EjecutarMenu(Gestionador& sistema) {
         cout << "\n------------------------------------------------------------------" << endl;
         cout << "ORDENAR POR: [C]alificacion | A[N]io de Lanzamiento | [A]lfabetico" << endl;
         cout << "\n------------------------------------------------------------------" << endl;
-        cout << "GUARDAR PELICULA DEL CATALOGO PARA ' VER MAS TARDE ' : [G]" << endl;
+        cout << "GUARDAR PELICULA DEL CATALOGO PARA VER MAS TARDE : [G]" << endl;
         cout << "\n------------------------------------------------------------------" << endl;
-        cout << "VER LISTA DE ' VER MAS TARDE ' : [V]" << endl;
+        cout << "VER LISTA DE VER MAS TARDE : [V]" << endl;
 
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ LO MAS VISTO ]\n" << endl;
         Console::ForegroundColor = ConsoleColor::White;
-        sistema.MostrarTops(TipoTop::MASVISTAS);
+        sistema.MostrarTopMenus(TipoTop::MASVISTAS);
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ RECIENTEMENTE AGREGADOS ]\n" << endl;
         Console::ForegroundColor = ConsoleColor::White;
-        sistema.MostrarTops(TipoTop::RECIENTES);
+        sistema.MostrarTopMenus(TipoTop::RECIENTES);
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ RECIENTEMENTE VISTOS POR USUARIO ]\n" << endl;
         Console::ForegroundColor = ConsoleColor::White;
-        sistema.MostrarTops(TipoTop::VISTOSRECIENTES);
+        sistema.MostrarTopMenus(TipoTop::VISTOSRECIENTES);
 
 
         Console::ForegroundColor = ConsoleColor::DarkBlue;
@@ -86,7 +86,7 @@ void EjecutarMenu(Gestionador& sistema) {
 
 int main() {
     Gestionador miSistema;
-    miSistema.cargarDesdeArchivos();
+    miSistema.CargarDesdeArchivos();
 
     EjecutarMenu(miSistema);
 
