@@ -19,7 +19,9 @@ void EjecutarMenu(Gestionador& sistema) {
         Console::ForegroundColor = ConsoleColor::Cyan;
         cout << "\n------------------------------------------------------------------" << endl;
         cout << "ORDENAR POR: [C]alificacion | A[N]io de Lanzamiento | [A]lfabetico" << endl;
+        cout << "\n------------------------------------------------------------------" << endl;
         cout << "GUARDAR PELICULA DEL CATALOGO PARA ' VER MAS TARDE ' : [G]" << endl;
+        cout << "\n------------------------------------------------------------------" << endl;
         cout << "VER LISTA DE ' VER MAS TARDE ' : [V]" << endl;
 
         Console::ForegroundColor = ConsoleColor::Yellow;

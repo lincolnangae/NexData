@@ -36,4 +36,34 @@ public:
         cantidad++;
     }
 
+    void InsertarEnPosicion(int indx, T dato) {
+        if (indx <= 1) {
+            // Por ahora, usaremos tu lógica existente si está vacía
+            InsertarAlFinal(dato);
+            return;
+        }
+
+        Nodo<T>* nuevo = new Nodo<T>(dato);
+        if (!cabeza) {
+            cabeza = nuevo;
+            cabeza->siguiente = cabeza;
+            cabeza->anterior = cabeza;
+        }
+        else {
+            Nodo<T>* curr = cabeza;
+            // Avanzar hasta la posición anterior a la deseada
+            for (int i = 1; i < indx - 1; i++) {
+                curr = curr->siguiente;
+                if (curr == cabeza) break; 
+            }
+
+            Nodo<T>* sig = curr->siguiente;
+            nuevo->siguiente = sig;
+            nuevo->anterior = curr;
+            curr->siguiente = nuevo;
+            sig->anterior = nuevo;
+        }
+        cantidad++;
+    }
+
 };

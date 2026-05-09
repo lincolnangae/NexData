@@ -72,7 +72,5 @@ public:
         actual--;
     }
 
-    Nodo<T_Format> GetCabeza2() { cabeza; }
-
     Nodo<T_Format>* GetCabeza() { return cabeza; }
 };
