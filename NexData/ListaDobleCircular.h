@@ -81,5 +81,20 @@ public:
         }
         cantidad++;
     }
+    void Clear() {
+
+        if (cabeza == nullptr) return;
+
+        Nodo<T>* curr = cabeza->siguiente;
+        while (curr != cabeza) {
+            Nodo<T>* temp = curr;
+            curr = curr->siguiente;
+            delete temp;
+        }
+
+        delete cabeza;
+        cabeza = nullptr;
+        cantidad = 0;
+    }
 
 };

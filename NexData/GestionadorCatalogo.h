@@ -1,5 +1,6 @@
 #pragma once
-#include "Dependencias.h"
+#include"Pila.h"
+#include"Usuario.h"
 #include "ListaDobleCircular.h"
 #include "ListaSimple.h"
 #include "Pelicula.h"
@@ -8,13 +9,13 @@
 enum class TipoTop { RECIENTES, MASVISTAS , VISTOSRECIENTES };
 class Gestionador {
 private:
-
+    User* Usuario;
     ListaCircularDoble<Pelicula<double>> Catalogo;
     ListaCircularDoble<Pelicula<double>> VerMasTarde; //Los recientes vistos
     ListaSimple<Pelicula<double>> TopMasVistos; //Los Mas Vistos
     ListaSimple<Pelicula<double>> TopRecientes; //Los ultimos de la lista
     ListaSimple<Pelicula<double>> TopRecienVistos; //Los ultimos de la lista
-
+    Pila<Pelicula<double>> pila;
 
     //Vistas Referenciales
     Pelicula<double> Top1;
@@ -331,7 +332,7 @@ public:
 
             Console::ForegroundColor = ConsoleColor::Cyan;
             cout << "------------------------------------------------------------------" << endl;
-            cout << "[Q] Anterior | [E] Siguiente | [S] Reordenar | [0] Salir" << endl;
+            cout << "[Q] Anterior | [E] Siguiente | [S] Reordenar | [V] Ver todas las peliculas | [0] Salir" << endl;
             cout << "------------------------------------------------------------------" << endl;
             Console::ForegroundColor = ConsoleColor::White;
 
@@ -394,6 +395,37 @@ public:
                 Console::ForegroundColor = ConsoleColor::White;
                 system("pause");
                 inicioVentana = VerMasTarde.GetCabeza();
+            }
+            else if (tecla == 'V') {
+                
+                Nodo<Pelicula<double>>* curr = VerMasTarde.GetCabeza();
+                
+                do {
+                    Pelicula<double> peli(0, curr->Dato.Titulo, curr->Dato.Lanzamiento, curr->Dato.Categorias, curr->Dato.Puntuacion, curr->Dato.Volumen, curr->Dato.VistasTotales);
+                    peli.VistasTotales++;
+                    Nodo<Pelicula<double>>* aux = Catalogo.GetCabeza();
+                    if (aux != nullptr) {
+                        do {
+                            if (aux->Dato.Titulo == peli.Titulo) {
+                                aux->Dato.Puntuacion = peli.Puntuacion;
+                                aux->Dato.Volumen = peli.Volumen;
+                                aux->Dato.VistasTotales = peli.VistasTotales;
+                                pila.push(peli);
+                                break;
+                            }
+                            aux = aux->siguiente;
+                        } while (aux != Catalogo.GetCabeza());
+                    }
+                    GuardarDatos();
+                    ActualizarTopVistas(peli);
+                    curr = curr->siguiente;
+                } while (curr != VerMasTarde.GetCabeza());
+                
+                VerMasTarde.Clear();
+
+                system("cls");
+                cout << "Usted vio todas las peliculas correctamente" << endl << "Presione una tecla para continuar..."; system("pause>0");
+                enMenu = 0;
             }
         }
     }
@@ -650,11 +682,22 @@ public:
                     Console::ForegroundColor = ConsoleColor::White;
 
                     tecla = _getch();
+                    Nodo<Pelicula<double>>* curr = VerMasTarde.GetCabeza();
+                    if (curr != nullptr) {
+                        do {
+                            if (curr->Dato.Titulo == peli.Titulo) {
+                                curr->Dato.Puntuacion = peli.Puntuacion;
+                                break;
+                            }
+                            curr = curr->siguiente;
+                        } while (curr != VerMasTarde.GetCabeza());
+                    }
                 }
 
             else if (tecla == 'V') { // REPRODUCIR
                 peli.VistasTotales++;
                 TopRecienVistos.InsertarAlInicio(peli);
+                pila.push(peli);
                 CleanScreen();
                 Console::ForegroundColor = ConsoleColor::Yellow;
                 Gotoxy((int)(GetAnchoVentana() / 2) - ((int)(peli.Titulo.length()) / 2), 1);
@@ -682,7 +725,16 @@ public:
                         aux = aux->siguiente;
                     } while (aux != Catalogo.GetCabeza());
                 }
-
+                //Actualizar datos de VerMasTarde dps de ver una peli por este modo
+                Nodo<Pelicula<double>>* curr = VerMasTarde.GetCabeza();
+                if (curr != nullptr) {
+                    do {
+                        if (curr->Dato.Titulo == peli.Titulo) {
+                            curr->Dato.VistasTotales = peli.VistasTotales;break;
+                        }
+                        curr = curr->siguiente;
+                    } while (curr != VerMasTarde.GetCabeza());
+                }
                 GuardarDatos();
                 ActualizarTopVistas(peli);
             }
@@ -710,6 +762,96 @@ public:
                 }
                 Console::ForegroundColor = ConsoleColor::White;
                 system("pause");
+            }
+        }
+    }
+    void IniciarSesion() {
+        auto mayuscula = [](string& s) {
+            for (auto& g : s) {
+                g = toupper(g);
+            }
+            };
+
+
+        String^ ruta = "Datos.bin";
+        FileStream^ fs = gcnew FileStream(ruta, FileMode::Open, FileAccess::Read);
+        BinaryReader^ leer = gcnew BinaryReader(fs);
+
+        String^ usuario1 = leer->ReadString();
+        String^ password1 = leer->ReadString();
+        string usuarioO = marshal_as<string>(usuario1), passwordO = marshal_as<string>(password1);
+        mayuscula(usuarioO);
+        mayuscula(passwordO);
+        Usuario = new User(usuarioO, passwordO);
+        leer->Close();
+        fs->Close();
+        string usuario, password;
+        do {
+            Console::ForegroundColor = ConsoleColor::Yellow;
+            Gotoxy((GetAnchoVentana() / 2) - 20, 0);
+            cout << "<<<Inicie sesion para poder continuar>>>" << endl;
+            Console::ForegroundColor = ConsoleColor::White;
+            cout << "Ingrese su usuario: "; cin >> usuario;
+            cout << "Ingrese su contrasena: "; cin >> password;
+            mayuscula(usuario);
+            mayuscula(password);
+            system("cls");
+        } while (usuario != Usuario->getUser() || password != Usuario->getPass());
+        cout << "Bienvenido "<<Usuario->getUser()<<", usted inicio sesion correctamente" << endl << "Presione una tecla para continuar...";
+        
+        system("pause>0");
+    }
+    void CrearCuenta() {
+        Console::ForegroundColor = ConsoleColor::Yellow;
+        Gotoxy((GetAnchoVentana()/2) - 20, 0);
+        cout << "<<<Registre su usuario para continuar>>>" << endl;
+        Console::ForegroundColor = ConsoleColor::White;
+        string usuario, password, passwordC;
+        cout << "Ingrese su usuario: "; cin >> usuario;
+        cout << "Ingrese su contrasena: "; cin >> password;
+        do {
+            cout << "Confirme su contrasena: "; cin >> passwordC;
+        } while (passwordC != password);
+        String^ ruta = "Datos.bin";
+        FileStream^ fs = gcnew FileStream(ruta, FileMode::OpenOrCreate);
+        BinaryWriter^ pen = gcnew BinaryWriter(fs);
+        //Transformar 
+        pen->Write(marshal_as<String^>(usuario));
+        pen->Write(marshal_as<String^>(password));
+        cout << "Se creo su cuenta correctamente" << endl << "Presione una tecla para continuar..."; system("pause>0");
+        pen->Close();
+        fs->Close();
+        system("cls");
+    }
+
+
+    void CargarHistorial() {
+        String^ ruta = "HistorialVisitado.txt";
+        int orden = 1;
+        if (File::Exists(ruta)) {
+            StreamReader^ reader = gcnew StreamReader(ruta);
+            try {
+                while (!reader->EndOfStream) {
+                    String^ line = reader->ReadLine();
+                    string titulo = marshal_as<string>(line);
+                    Nodo<Pelicula<double>>* curr = Catalogo.GetCabeza();
+                    do {
+                        if (curr->Dato.Titulo == titulo) {
+                            Pelicula<double> nuevaPeli(orden, titulo, curr->Dato.Lanzamiento, curr->Dato.Categorias, curr->Dato.Puntuacion, curr->Dato.Volumen, curr->Dato.VistasTotales);
+                            pila.push(nuevaPeli);
+                            break;
+                        }
+
+                        curr = curr->siguiente;
+                    } while (curr != Catalogo.GetCabeza());
+                    
+                }
+            }
+            catch (Exception^ ex) {
+                cout << "Error critico al procesar los datos: " << marshal_as<string>(ex->Message) << endl;
+            }
+            finally {
+                reader->Close();
             }
         }
     }

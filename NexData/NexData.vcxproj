@@ -126,6 +126,7 @@
     <ResourceCompile Include="app.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cola.h" />
     <ClInclude Include="Complementos.h" />
     <ClInclude Include="Dependencias.h" />
     <ClInclude Include="GestionadorCatalogo.h" />
@@ -135,7 +136,9 @@
     <ClInclude Include="Nodo.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Pelicula.h" />
+    <ClInclude Include="Pila.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Usuario.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />

@@ -7,6 +7,7 @@
 #include<vector>
 #include"chrono"
 #include"thread"
+#include"fstream"
 using namespace System;
 using namespace std;
 using namespace System::IO;

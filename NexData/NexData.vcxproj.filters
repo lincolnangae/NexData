@@ -50,6 +50,15 @@
     <ClInclude Include="Pelicula.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Usuario.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cola.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pila.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NexData.cpp">

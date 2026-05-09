@@ -23,6 +23,7 @@ void EjecutarMenu(Gestionador& sistema) {
         cout << "GUARDAR PELICULA DEL CATALOGO PARA VER MAS TARDE : [G]" << endl;
         cout << "\n------------------------------------------------------------------" << endl;
         cout << "VER LISTA DE VER MAS TARDE : [V]" << endl;
+        cout << endl << "------------------------------------------------------------------" << endl<<"Ver Historia historico [H]"<<endl<<endl;
 
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ LO MAS VISTO ]\n" << endl;
@@ -81,12 +82,29 @@ void EjecutarMenu(Gestionador& sistema) {
         else if (tecla == 'v' || tecla == 'V') {
             sistema.VerListaVerMasTarde();
         }
+        else if (tecla == 'h' || tecla == 'H') {
+
+        }
     }
 }
-
+void IniciarSesion(Gestionador& misistema) {
+    String^ ruta = "Datos.bin";
+    if (File::Exists(ruta)) {
+        misistema.IniciarSesion();
+    }
+    else {
+        misistema.CrearCuenta();
+    }
+}
 int main() {
+    bool ExisteCuenta = 0;
     Gestionador miSistema;
+    String^ ruta = "Datos.bin";
+    if (File::Exists(ruta)) ExisteCuenta = 1;
+    if (!ExisteCuenta) miSistema.CrearCuenta();
+    IniciarSesion(miSistema);
     miSistema.CargarDesdeArchivos();
+    miSistema.CargarHistorial();
 
     EjecutarMenu(miSistema);
 
