@@ -120,6 +120,21 @@ public:
                 escritor->Close();
             }
         }
+        String^ RutaHistorial = "HistorialVisitado.txt";
+        StreamWriter^ writer = gcnew StreamWriter(RutaHistorial);
+        try {
+            Nodo<Pelicula<double>>* tmp = pila.getCima();
+            while (tmp != nullptr) {
+                writer->WriteLine(marshal_as<String^>(tmp->Dato.Titulo));
+                tmp = tmp->siguiente;
+            }
+        }
+        catch (Exception^ ex) {
+            cout << "Error al guardar: " << marshal_as<string>(ex->Message) << endl;
+        }
+        finally {
+            writer->Close();
+        }
     }
 
     void ActualizarTopVistas(Pelicula<double> p) {
@@ -824,12 +839,13 @@ public:
         system("cls");
     }
 
-
+    //Cargar datos de pila, del atras para adelante
     void CargarHistorial() {
         String^ ruta = "HistorialVisitado.txt";
         int orden = 1;
         if (File::Exists(ruta)) {
             StreamReader^ reader = gcnew StreamReader(ruta);
+            vector<Pelicula<double>> tmp;
             try {
                 while (!reader->EndOfStream) {
                     String^ line = reader->ReadLine();
@@ -838,10 +854,9 @@ public:
                     do {
                         if (curr->Dato.Titulo == titulo) {
                             Pelicula<double> nuevaPeli(orden, titulo, curr->Dato.Lanzamiento, curr->Dato.Categorias, curr->Dato.Puntuacion, curr->Dato.Volumen, curr->Dato.VistasTotales);
-                            pila.push(nuevaPeli);
+                            tmp.push_back(nuevaPeli);
                             break;
                         }
-
                         curr = curr->siguiente;
                     } while (curr != Catalogo.GetCabeza());
                     
@@ -853,6 +868,15 @@ public:
             finally {
                 reader->Close();
             }
+            reverse(tmp.begin(), tmp.end());
+            for (auto g : tmp) {
+                pila.push(g);
+            }
         }
     }
+    
+    void MostrarHistorialHistorico() {
+
+    }
+
 };

@@ -83,7 +83,7 @@ void EjecutarMenu(Gestionador& sistema) {
             sistema.VerListaVerMasTarde();
         }
         else if (tecla == 'h' || tecla == 'H') {
-
+            sistema.MostrarHistorialHistorico();
         }
     }
 }
