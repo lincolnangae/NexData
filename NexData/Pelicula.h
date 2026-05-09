@@ -40,40 +40,60 @@ public:
         cout << endl;
     }
 
-    void ImprimirInfoExtendida(int y) {
-        auto limpiarTexto = [](string texto) {
-            for (char& c : texto) {
-                if (c == '-') c = ' ';
-            }
-            return texto;
-        };
-        auto GotoxSimplified = [](int x, int y) {
-            Gotoxy(x, y);
-            };
+	void ImprimirInfoExtendida(int y, bool estaGuardada = false) {
+		auto limpiarTexto = [](string texto) {
+			for (char& c : texto) {
+				if (c == '-') c = ' ';
+			}
+			return texto;
+		};
+		auto GotoxSimplified = [](int x, int y) {
+			Gotoxy(x, y);
+			};
 
-        cout << endl;
-        GotoxSimplified((int)((GetAnchoVentana() / 2) - (Titulo.length() / 2) - 3), y + 3);
-        Console::ForegroundColor = ConsoleColor::Yellow;
-        cout << "<<<" << limpiarTexto(Titulo) << ">>>";
-        Console::ForegroundColor = ConsoleColor::White;
-        GotoxSimplified(5, y + 5); cout << "ANIO DE LANZAMIENTO: " << Lanzamiento;
-        GotoxSimplified(5, y+6);
-        cout<< "RATING: " << Puntuacion << endl;
-        GotoxSimplified(5, y + 7);
-        cout << "CATEGORIAS: ";
-        int indice = 0;
-        for (auto g : Categorias) {
-            cout << g;
-            if (indice < Categorias.size() - 1) cout << " | ";
-            indice++;
-        }
-        cout << endl;
-        GotoxSimplified(5, y + 8);
-        cout << "VISTAS TOTALES: " << VistasTotales;
-        GotoxSimplified(5, y + 9);
+		cout << endl;
+		GotoxSimplified((int)((GetAnchoVentana() / 2) - (Titulo.length() / 2) - 3), y + 3);
+		Console::ForegroundColor = ConsoleColor::Yellow;
+		cout << "<<<" << limpiarTexto(Titulo) << ">>>";
+		Console::ForegroundColor = ConsoleColor::White;
+		GotoxSimplified(5, y + 5); cout << "ANIO DE LANZAMIENTO: " << Lanzamiento;
+		GotoxSimplified(5, y+6);
+		cout<< "RATING: " << Puntuacion << endl;
+		GotoxSimplified(5, y + 7);
+		cout << "CATEGORIAS: ";
+		int indice = 0;
+		for (auto g : Categorias) {
+			cout << g;
+			if (indice < Categorias.size() - 1) cout << " | ";
+			indice++;
+		}
+		cout << endl;
+		GotoxSimplified(5, y + 8);
+		cout << "VISTAS TOTALES: " << VistasTotales;
+		GotoxSimplified(5, y + 9);
 		cout << "CANTIDAD DE USUARIOS VOTANTES: " << Volumen << endl;
-        GotoxSimplified(0, 0);
-        cout << "CALIFICAR PELICULA [C] | VER PELICULA [V] | SALIR [S]" << endl;
 
-    }
+		// Mostrar si está guardada para "Ver más tarde"
+		if (estaGuardada) {
+			GotoxSimplified(5, y + 10);
+			Console::ForegroundColor = ConsoleColor::Green;
+			cout << "[" << char(88) << "] Guardada en 'Ver mas tarde'";  // 88 = X
+			Console::ForegroundColor = ConsoleColor::White;
+			cout << endl;
+		}
+		auto simbolito = []() {
+			Console::ForegroundColor = ConsoleColor::Red;
+			cout << char(124);  // | en rojo
+			Console::ForegroundColor = ConsoleColor::White;
+		};
+		GotoxSimplified(0, 0);
+		cout << "CALIFICAR [C] ";
+		simbolito();
+		cout << " VER [V] ";
+		simbolito();
+		cout << " GUARDAR PARA VER MAS TARDE [G] ";
+		simbolito();
+		cout << " SALIR [S]" << endl;
+
+	}
 };

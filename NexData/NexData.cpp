@@ -12,13 +12,15 @@ void EjecutarMenu(Gestionador& sistema) {
 
         Console::ForegroundColor = ConsoleColor::Green;
 
-        Gotoxy(GetAnchoVentana() / 2 - 20, 0);cout << "========================================" << endl;
-        Gotoxy(GetAnchoVentana() / 2 - 20, 1);cout << "             NEXT --- DATA              " << endl;
-        Gotoxy(GetAnchoVentana() / 2 - 20, 2);cout << "========================================" << endl;
+        Gotoxy(GetAnchoVentana() / 2 - 20, 0); cout << "========================================" << endl;
+        Gotoxy(GetAnchoVentana() / 2 - 20, 1); cout << "             NEXT --- DATA              " << endl;
+        Gotoxy(GetAnchoVentana() / 2 - 20, 2); cout << "========================================" << endl;
 
         Console::ForegroundColor = ConsoleColor::Cyan;
         cout << "\n------------------------------------------------------------------" << endl;
         cout << "ORDENAR POR: [C]alificacion | A[N]io de Lanzamiento | [A]lfabetico" << endl;
+        cout << "GUARDAR PELICULA DEL CATALOGO PARA ' VER MAS TARDE ' : [G]" << endl;
+        cout << "VER LISTA DE ' VER MAS TARDE ' : [V]" << endl;
 
         Console::ForegroundColor = ConsoleColor::Yellow;
         cout << "\n[ LO MAS VISTO ]\n" << endl;
@@ -76,6 +78,12 @@ void EjecutarMenu(Gestionador& sistema) {
             system("cls");
             cout << "[ FILTRANDO ALFABETICAMENTE... ]" << endl;
             system("pause");
+        }
+        else if (tecla == 'g' || tecla == 'G') {
+            sistema.GuardarParaVerMasTarde();
+        }
+        else if (tecla == 'v' || tecla == 'V') {
+            sistema.VerListaVerMasTarde();
         }
     }
 }

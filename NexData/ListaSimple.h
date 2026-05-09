@@ -28,18 +28,19 @@ public:
         actual++;
     }
 
-    void InsertarEnPosicion(int indx, T_Format dato) {
-        if (cabeza != nullptr) {
-            if (dato.Titulo == cabeza->Dato.Titulo) {
-                return;
-            }
-        }
+	void InsertarEnPosicion(int indx, T_Format dato) {
+		if (cabeza != nullptr) {
+			if (dato.Titulo == cabeza->Dato.Titulo) {
+				return;
+			}
+		}
 
 		Nodo<T_Format>* nuevo = new Nodo<T_Format>(dato);
-        Nodo<T_Format>* curr = cabeza;
-        if (indx == 1) {
+		Nodo<T_Format>* curr = cabeza;
+		if (indx == 1) {
 			nuevo->siguiente = cabeza;
 			cabeza = nuevo;
+			actual++;
 		}
 		else {
 			for (int i = 1; i < indx - 1 && curr != nullptr; i++) {
@@ -48,9 +49,10 @@ public:
 			if (curr != nullptr) {
 				nuevo->siguiente = curr->siguiente;
 				curr->siguiente = nuevo;
+				actual++;
 			}
-        }
-    }
+		}
+	}
     //Como dijimos, en el menu principal solo se mostraran 3 peliculas
     //Esta logica evita que cualquiera de estas tenga mas de  3 elementos
     void EliminarUltimo() {

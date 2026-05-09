@@ -14,6 +14,7 @@ private:
     ListaSimple<Pelicula<double>> TopMasVistos; //Los Mas Vistos
     ListaSimple<Pelicula<double>> TopRecientes; //Los ultimos de la lista
     ListaSimple<Pelicula<double>> TopRecienVistos; //Los ultimos de la lista
+    ListaSimple<Pelicula<double>> VerMasTarde;  // Nueva lista para 'ver mas tarde'
 
     //Vistas Referenciales
     Pelicula<double> Top1;
@@ -26,7 +27,7 @@ private:
 
 public:
 
-    Gestionador() {
+    Gestionador() : VerMasTarde(1000) {  // Capacidad de 1000 películas en "Ver más tarde"
         TopVistas1 = 0;
         TopVistas2 = 0;
         TopVistas3 = 0;
@@ -203,7 +204,20 @@ public:
         }
         char tecla = ' ';
         while (tecla != 'S') {
-            curr->Dato.ImprimirInfoExtendida(1);
+            // Verificar si la película está guardada en "Ver más tarde"
+            Nodo<Pelicula<double>>* tempCheck = VerMasTarde.GetCabeza();
+            bool estaGuardada = false;
+
+            while (tempCheck != nullptr) {
+                if (tempCheck->Dato.Titulo == curr->Dato.Titulo) {
+                    estaGuardada = true;
+                    break;
+                }
+                tempCheck = tempCheck->siguiente;
+            }
+
+            // Mostrar la información con el indicador de guardado
+            curr->Dato.ImprimirInfoExtendida(1, estaGuardada);
             tecla = CambiarMayuscula(_getch());
             switch (tecla) {
             case 'C':
@@ -261,10 +275,287 @@ public:
                 }
                 ActualizarTopVistas(curr->Dato);
                 break; //Ver Pelicula (Aumentar vistas totales)
+            case 'G':
+                {
+                    // Verificar si ya está en la lista antes de guardar
+                    Nodo<Pelicula<double>>* tempCheck = VerMasTarde.GetCabeza();
+                    bool yaGuardada = false;
+
+                    while (tempCheck != nullptr) {
+                        if (tempCheck->Dato.Titulo == curr->Dato.Titulo) {
+                            yaGuardada = true;
+                            break;
+                        }
+                        tempCheck = tempCheck->siguiente;
+                    }
+
+                    CleanScreen();
+
+                    if (yaGuardada) {
+                        Console::ForegroundColor = ConsoleColor::Yellow;
+                        Gotoxy((int)(GetAnchoVentana() / 2) - 20, 1);
+                        cout << "PELICULA YA GUARDADA";
+                        Console::ForegroundColor = ConsoleColor::White;
+                        cout << endl << endl;
+                        cout << "La pelicula '" << LimpiarTexto(curr->Dato.Titulo) << "' ya estaba en tu lista 'Ver mas tarde'." << endl;
+                    } else {
+                        VerMasTarde.InsertarAlInicio(curr->Dato);
+                        Console::ForegroundColor = ConsoleColor::Green;
+                        Gotoxy((int)(GetAnchoVentana() / 2) - 25, 1);
+                        cout << "PELICULA GUARDADA PARA VER MAS TARDE";
+                        Console::ForegroundColor = ConsoleColor::White;
+                        cout << endl << endl;
+                        cout << "La pelicula '" << LimpiarTexto(curr->Dato.Titulo) << "' ha sido guardada exitosamente." << endl;
+                    }
+
+                    system("pause");
+                    CleanScreen();  // ← LIMPIAR PANTALLA DESPUÉS DE PAUSE
+                }
+                break; //Guardar para ver más tarde
             case 'S': break;
             }
         }
 
 
+
+    }
+
+    // Método auxiliar para obtener película por índice desde DatosModificables
+    Pelicula<double> ObtenerPeliculaPorIndice(int indice) {
+        // Usar DatosModificables que es un vector con todas las películas cargadas desde el TXT
+        if (indice > 0 && indice <= (int)DatosModificables.size()) {
+            return DatosModificables[indice - 1];  // Los vectores empiezan en 0, usuario cuenta desde 1
+        }
+        return Pelicula<double>();  // Retorna película vacía si no existe
+    }
+
+    // Método auxiliar para contar películas en el catálogo
+    int ContarPeliculasEnCatalogo() {
+        return (int)DatosModificables.size();  // Retorna el tamaño del vector
+    }
+
+    void GuardarParaVerMasTarde() {
+        system("cls");
+        auto CleanScreen = []() {
+            system("cls");
+        };
+        auto LimpiarTexto = [](string texto) {
+            for (char& c : texto) {
+                if (c == '-') c = ' ';
+            }
+            return texto;
+        };
+
+        Console::ForegroundColor = ConsoleColor::Yellow;
+        cout << "\n======== AGREGAR A 'VER MAS TARDE' ========\n" << endl;
+        Console::ForegroundColor = ConsoleColor::White;
+
+        int totalPeliculas = ContarPeliculasEnCatalogo();
+        if (totalPeliculas == 0) {
+            Console::ForegroundColor = ConsoleColor::Red;
+            cout << "No hay peliculas en el catalogo." << endl;
+            Console::ForegroundColor = ConsoleColor::White;
+            system("pause");
+            return;
+        }
+
+        // Mostrar todas las películas del catálogo desde DatosModificables
+        cout << "\n[ PELICULAS DISPONIBLES ]\n" << endl;
+        for (int i = 0; i < totalPeliculas; i++) {
+            cout << (i + 1) << ". ";
+            DatosModificables[i].MostrarEnLista();
+            cout << endl;
+        }
+
+        char continuar = 'S';
+        while (continuar == 'S' || continuar == 's') {
+            int numPeli;
+            cout << "\nIngresa el numero de pelicula a guardar (0 para terminar): ";
+            cin >> numPeli;
+
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore((numeric_limits<streamsize>::max)(), '\n');
+                Console::ForegroundColor = ConsoleColor::Red;
+                cout << "Error: Debes ingresar un numero." << endl;
+                Console::ForegroundColor = ConsoleColor::White;
+                continue;
+            }
+
+            if (numPeli == 0) break;
+
+            if (numPeli < 1 || numPeli > totalPeliculas) {
+                Console::ForegroundColor = ConsoleColor::Red;
+                cout << "Numero invalido. Intenta de nuevo." << endl;
+                Console::ForegroundColor = ConsoleColor::White;
+                continue;
+            }
+
+            // Obtener la película del catálogo y agregarla a VerMasTarde
+            Pelicula<double> peliSeleccionada = ObtenerPeliculaPorIndice(numPeli);
+            VerMasTarde.InsertarAlInicio(peliSeleccionada);
+
+            Console::ForegroundColor = ConsoleColor::Green;
+            cout << "Pelicula '" << LimpiarTexto(peliSeleccionada.Titulo) << "' guardada para ver mas tarde." << endl;
+            Console::ForegroundColor = ConsoleColor::White;
+
+            cout << "Agregar otra? (S/N): ";
+            continuar = _getch();
+        }
+
+        CleanScreen();
+        Console::ForegroundColor = ConsoleColor::Green;
+        cout << "Peliculas guardadas exitosamente." << endl;
+        Console::ForegroundColor = ConsoleColor::White;
+        system("pause");
+    }
+
+    void VerListaVerMasTarde() {
+        system("cls");
+        auto CleanScreen = []() {
+            system("cls");
+        };
+        auto LimpiarTexto = [](string texto) {
+            for (char& c : texto) {
+                if (c == '-') c = ' ';
+            }
+            return texto;
+        };
+
+        mostrar_lista:
+        Console::ForegroundColor = ConsoleColor::Yellow;
+        cout << "\n======== LISTA 'VER MAS TARDE' ========\n" << endl;
+        Console::ForegroundColor = ConsoleColor::White;
+
+        // Mostrar la lista actual
+        Nodo<Pelicula<double>>* actual = VerMasTarde.GetCabeza();
+        int indice = 1;
+
+        if (actual == nullptr) {
+            Console::ForegroundColor = ConsoleColor::Red;
+            cout << "La lista esta vacia." << endl;
+            Console::ForegroundColor = ConsoleColor::White;
+            system("pause");
+            return;
+        }
+
+        while (actual != nullptr) {
+            cout << indice << ". ";
+            actual->Dato.MostrarEnLista();
+            actual = actual->siguiente;
+            indice++;
+            cout << endl;
+        }
+
+        // Contar películas en la lista
+        int totalPelisVerMasTarde = 0;
+        Nodo<Pelicula<double>>* temp = VerMasTarde.GetCabeza();
+        while (temp != nullptr) {
+            totalPelisVerMasTarde++;
+            temp = temp->siguiente;
+        }
+
+        char opcion = ' ';
+        while (true) {
+            cout << "\n¿Deseas reordenar? (S/N): ";
+            opcion = _getch();
+
+            if (opcion == 'N' || opcion == 'n') {
+                break;
+            }
+            else if (opcion == 'S' || opcion == 's') {
+                CleanScreen();
+
+                cout << "\n======== REORDENAR LISTA 'VER MAS TARDE' ========\n" << endl;
+
+                // Mostrar la lista nuevamente
+                actual = VerMasTarde.GetCabeza();
+                indice = 1;
+                while (actual != nullptr) {
+                    cout << indice << ". ";
+                    actual->Dato.MostrarEnLista();
+                    actual = actual->siguiente;
+                    indice++;
+                    cout << endl;
+                }
+
+                int peliculaActual, posicionNueva;
+
+                cout << "\n¿Que pelicula deseas mover? (numero): ";
+                cin >> peliculaActual;
+
+                if (cin.fail() || peliculaActual < 1 || peliculaActual > totalPelisVerMasTarde) {
+                    cin.clear();
+                    cin.ignore((numeric_limits<streamsize>::max)(), '\n');
+                    Console::ForegroundColor = ConsoleColor::Red;
+                    cout << "Numero invalido." << endl;
+                    Console::ForegroundColor = ConsoleColor::White;
+                    system("pause");
+                    CleanScreen();
+                    goto mostrar_lista;
+                }
+
+                cout << "¿A que posicion? (numero): ";
+                cin >> posicionNueva;
+
+                if (cin.fail() || posicionNueva < 1 || posicionNueva > totalPelisVerMasTarde) {
+                    cin.clear();
+                    cin.ignore((numeric_limits<streamsize>::max)(), '\n');
+                    Console::ForegroundColor = ConsoleColor::Red;
+                    cout << "Numero invalido." << endl;
+                    Console::ForegroundColor = ConsoleColor::White;
+                    system("pause");
+                    CleanScreen();
+                    goto mostrar_lista;
+                }
+
+                // PASO 1: Extraer todas las películas de VerMasTarde en un vector
+                vector<Pelicula<double>> peliculasEnOrden;
+                actual = VerMasTarde.GetCabeza();
+                int contador = 1;
+                Pelicula<double> peliculaAMover;
+
+                while (actual != nullptr) {
+                    if (contador == peliculaActual) {
+                        peliculaAMover = actual->Dato;  // Guardamos la película a mover
+                    } else {
+                        peliculasEnOrden.push_back(actual->Dato);  // Guardamos las demás
+                    }
+                    actual = actual->siguiente;
+                    contador++;
+                }
+
+                // PASO 2: Insertar la película a mover en la posición deseada del vector
+                if (posicionNueva > (int)peliculasEnOrden.size()) {
+                    peliculasEnOrden.push_back(peliculaAMover);  // Al final
+                } else {
+                    peliculasEnOrden.insert(peliculasEnOrden.begin() + (posicionNueva - 1), peliculaAMover);
+                }
+
+                // PASO 3: Limpiar VerMasTarde
+                VerMasTarde = ListaSimple<Pelicula<double>>(1000);
+
+                // PASO 4: Reconstruir VerMasTarde usando InsertarEnPosicion()
+                // Primero insertamos la primera película al inicio
+                if (peliculasEnOrden.size() > 0) {
+                    VerMasTarde.InsertarAlInicio(peliculasEnOrden[0]);
+
+                    // Luego insertamos el resto en sus posiciones correctas usando InsertarEnPosicion()
+                    for (int i = 1; i < (int)peliculasEnOrden.size(); i++) {
+                        VerMasTarde.InsertarEnPosicion(i + 1, peliculasEnOrden[i]);
+                    }
+                }
+
+                Console::ForegroundColor = ConsoleColor::Green;
+                cout << "\nPelicula '" << LimpiarTexto(peliculaAMover.Titulo) << "' movida a la posicion " << posicionNueva << endl;
+                Console::ForegroundColor = ConsoleColor::White;
+                system("pause");
+
+                CleanScreen();
+                goto mostrar_lista;
+            }
+        }
+
+        CleanScreen();
     }
 };
