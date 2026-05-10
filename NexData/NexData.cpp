@@ -90,46 +90,73 @@ void EjecutarMenu(Gestionador& sistema) {
 }
 
 bool FaseAutenticacion(ServicioAutenticacion& auth) {
-    char opcion;
+    char tecla;
     bool autenticado = false;
+    char b = (char)219;
+    int xCentro = GetAnchoVentana() / 2 - 20;
 
     while (!autenticado) {
         system("cls");
-        cout << "========================================" << endl;
-        cout << "       SISTEMA DE CATALOGO - NEXT       " << endl;
-        cout << "========================================" << endl;
+
+        // Cabecera con Bloques (Estilo Sólido)
+        Console::ForegroundColor = ConsoleColor::Yellow;
+        Gotoxy(xCentro, 0); for (int i = 0; i < 40; i++) cout << b;
+        Gotoxy(xCentro, 1); cout << b << "       SISTEMA DE CATALOGO - NEXT       " << b;
+        Gotoxy(xCentro, 2); for (int i = 0; i < 40; i++) cout << b;
 
         if (!auth.ExisteCuenta()) {
+            Console::ForegroundColor = ConsoleColor::Cyan;
+            Gotoxy(xCentro, 4); cout << "[!] No se detecto ninguna cuenta activa.";
+            Gotoxy(xCentro, 5); cout << "Redirigiendo al registro...";
+            Console::ForegroundColor = ConsoleColor::White;
+            _getch();
             auth.Registrar();
         }
         else {
-            cout << "1. Iniciar Sesion" << endl;
-            cout << "2. Crear Nueva Cuenta (Sobrescribir)" << endl;
-            cout << "0. Salir" << endl;
-            cout << "\nOpcion: ";
-            opcion = _getch();
+            // Cuerpo del Menú
+            Console::ForegroundColor = ConsoleColor::Cyan;
+            Gotoxy(xCentro, 4); cout << "----------------------------------------";
+            Gotoxy(xCentro, 5); cout << "[1] Iniciar Sesion  |  [2] Nueva Cuenta ";
+            Gotoxy(xCentro, 6); cout << "[0] Salir del Sistema";
+            Gotoxy(xCentro, 7); cout << "----------------------------------------";
 
-            if (opcion == '1') {
+            Console::ForegroundColor = ConsoleColor::White;
+            Gotoxy(xCentro, 9); cout << "Seleccione una opcion: ";
+            tecla = _getch();
+
+            if (tecla == '1') {
                 string user, pass;
                 system("cls");
-                cout << "--- LOGIN ---" << endl;
-                cout << "Usuario: "; cin >> user;
-                cout << "Contraseña: "; cin >> pass;
+
+                // Banner de Login
+                Console::ForegroundColor = ConsoleColor::Yellow;
+                Gotoxy(xCentro, 0); for (int i = 0; i < 20; i++) cout << b;
+                Gotoxy(xCentro, 1); cout << b << "      LOGIN       " << b;
+                Gotoxy(xCentro, 2); for (int i = 0; i < 20; i++) cout << b;
+
+                Console::ForegroundColor = ConsoleColor::White;
+                Gotoxy(xCentro, 4); cout << "Usuario: "; cin >> user;
+                Gotoxy(xCentro, 5); cout << "Password: "; cin >> pass;
 
                 if (auth.Autenticar(user, pass)) {
                     autenticado = true;
-                    cout << "\nBienvenido al sistema." << endl;
-                    system("pause");
+                    Console::ForegroundColor = ConsoleColor::Green;
+                    Gotoxy(xCentro, 7); cout << ">> Acceso concedido. Bienvenido.";
+                    Console::ForegroundColor = ConsoleColor::White;
+                    _getch();
                 }
                 else {
-                    cout << "\nError. Fallos en esta sesion: " << auth.GetNumeroDeFallos() << endl;
-                    system("pause");
+                    Console::ForegroundColor = ConsoleColor::Red;
+                    Gotoxy(xCentro, 7); cout << ">> Error de credenciales.";
+                    Gotoxy(xCentro, 8); cout << ">> Fallos: " << auth.GetNumeroDeFallos();
+                    Console::ForegroundColor = ConsoleColor::White;
+                    _getch();
                 }
             }
-            else if (opcion == '2') {
+            else if (tecla == '2') {
                 auth.Registrar();
             }
-            else if (opcion == '0') {
+            else if (tecla == '0') {
                 return false;
             }
         }
