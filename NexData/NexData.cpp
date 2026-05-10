@@ -3,6 +3,7 @@
 #include <conio.h>
 using namespace std;
 #include "GestionadorCatalogo.h"
+#include "ServicioAutenticacion.h"
 
 void EjecutarMenu(Gestionador& sistema) {
     char tecla = ' ';
@@ -83,32 +84,76 @@ void EjecutarMenu(Gestionador& sistema) {
             sistema.VerListaVerMasTarde();
         }
         else if (tecla == 'h' || tecla == 'H') {
-            sistema.MostrarHistorialHistorico();
+            sistema.MostrarListaHistorico();
         }
     }
 }
-void IniciarSesion(Gestionador& misistema) {
-    String^ ruta = "Datos.bin";
-    if (File::Exists(ruta)) {
-        misistema.IniciarSesion();
+
+bool FaseAutenticacion(ServicioAutenticacion& auth) {
+    char opcion;
+    bool autenticado = false;
+
+    while (!autenticado) {
+        system("cls");
+        cout << "========================================" << endl;
+        cout << "       SISTEMA DE CATALOGO - NEXT       " << endl;
+        cout << "========================================" << endl;
+
+        if (!auth.ExisteCuenta()) {
+            auth.Registrar();
+        }
+        else {
+            cout << "1. Iniciar Sesion" << endl;
+            cout << "2. Crear Nueva Cuenta (Sobrescribir)" << endl;
+            cout << "0. Salir" << endl;
+            cout << "\nOpcion: ";
+            opcion = _getch();
+
+            if (opcion == '1') {
+                string user, pass;
+                system("cls");
+                cout << "--- LOGIN ---" << endl;
+                cout << "Usuario: "; cin >> user;
+                cout << "Contraseña: "; cin >> pass;
+
+                if (auth.Autenticar(user, pass)) {
+                    autenticado = true;
+                    cout << "\nBienvenido al sistema." << endl;
+                    system("pause");
+                }
+                else {
+                    cout << "\nError. Fallos en esta sesion: " << auth.GetNumeroDeFallos() << endl;
+                    system("pause");
+                }
+            }
+            else if (opcion == '2') {
+                auth.Registrar();
+            }
+            else if (opcion == '0') {
+                return false;
+            }
+        }
     }
-    else {
-        misistema.CrearCuenta();
-    }
+    return true;
 }
+
 int main() {
-    bool ExisteCuenta = 0;
+    UsuarioRepositorio repoUsuarios;
+    ServicioAutenticacion auth(&repoUsuarios);
     Gestionador miSistema;
-    String^ ruta = "Datos.bin";
-    if (File::Exists(ruta)) ExisteCuenta = 1;
-    if (!ExisteCuenta) miSistema.CrearCuenta();
-    IniciarSesion(miSistema);
-    miSistema.CargarDesdeArchivos();
-    miSistema.CargarHistorial();
 
-    EjecutarMenu(miSistema);
+    if (auth.ExisteCuenta()) {
+        repoUsuarios.Cargar();
+    }
 
-    miSistema.GuardarDatos();
+    if (FaseAutenticacion(auth)) {
+        miSistema.Iniciar();
+        miSistema.CargarHistorial();
+
+        EjecutarMenu(miSistema);
+
+        miSistema.Guardar();
+    }
 
     return 0;
 }

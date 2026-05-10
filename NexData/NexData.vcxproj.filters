@@ -13,6 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\FuncionesUsuario">
+      <UniqueIdentifier>{00b0176f-73f1-416d-8944-5dcf28debc43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Estructuras">
+      <UniqueIdentifier>{d5ecccc1-502f-47a5-a54e-7f916af56c2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Otros">
+      <UniqueIdentifier>{25380b17-1c21-43df-8bda-bbd511bef3a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ClasesdeDatos">
+      <UniqueIdentifier>{68bd738e-79bb-4ec0-8939-a0ae8b2786fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Algoritmos">
+      <UniqueIdentifier>{b746eb8a-e170-46ee-8fd6-6a78b95c39d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc">
@@ -20,44 +35,59 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Header.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dependencias.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Complementos.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GestionadorCatalogo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ListaDobleCircular.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListaSimple.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Nodo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Pelicula.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ServicioAutenticacion.h">
+      <Filter>Header Files\FuncionesUsuario</Filter>
     </ClInclude>
     <ClInclude Include="Usuario.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\FuncionesUsuario</Filter>
     </ClInclude>
-    <ClInclude Include="Cola.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="UsuarioRepositorio.h">
+      <Filter>Header Files\FuncionesUsuario</Filter>
+    </ClInclude>
+    <ClInclude Include="ListaDobleCircular.h">
+      <Filter>Header Files\Estructuras</Filter>
+    </ClInclude>
+    <ClInclude Include="ListaSimple.h">
+      <Filter>Header Files\Estructuras</Filter>
     </ClInclude>
     <ClInclude Include="Pila.h">
+      <Filter>Header Files\Estructuras</Filter>
+    </ClInclude>
+    <ClInclude Include="Cola.h">
+      <Filter>Header Files\Estructuras</Filter>
+    </ClInclude>
+    <ClInclude Include="Complementos.h">
+      <Filter>Header Files\Otros</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependencias.h">
+      <Filter>Header Files\Otros</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files\Otros</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files\Otros</Filter>
+    </ClInclude>
+    <ClInclude Include="Nodo.h">
+      <Filter>Header Files\Estructuras</Filter>
+    </ClInclude>
+    <ClInclude Include="Pelicula.h">
+      <Filter>Header Files\ClasesdeDatos</Filter>
+    </ClInclude>
+    <ClInclude Include="PeliculaMetadata.h">
+      <Filter>Header Files\ClasesdeDatos</Filter>
+    </ClInclude>
+    <ClInclude Include="PeliculaEstadisticas.h">
+      <Filter>Header Files\ClasesdeDatos</Filter>
+    </ClInclude>
+    <ClInclude Include="GestionadorArchivos.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AlgoritmoServicio.h">
+      <Filter>Header Files\Algoritmos</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

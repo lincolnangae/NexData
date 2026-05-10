@@ -18,7 +18,7 @@ public:
     void InsertarAlFinal(T dato) {
 
         if (cabeza != nullptr) {
-            if (dato.Titulo == cabeza->Dato.Titulo) {
+            if (dato == cabeza->Dato) {
                 return;
             }
         }
@@ -42,7 +42,7 @@ public:
     void InsertarAlInicio(T dato) {
 
         if (cabeza != nullptr) {
-            if (dato.Titulo == cabeza->Dato.Titulo) {
+            if (dato == cabeza->Dato) {
                 return;
             }
         }

@@ -1,22 +1,41 @@
 #pragma once
-#include"Nodo.h"
-template<typename T>
-class Pila
-{
-public:
-	Pila() {
-		top = nullptr;
-	}
-	~Pila(){}
-	void push(T dato) {
-		Nodo<T>* nuevo = new Nodo<T>(dato);
-		nuevo->siguiente = top;
-		top = nuevo;
-	}
+#include "Nodo.h"
+#include <iostream>
 
-	Nodo<T>* getCima() {
-		return top;
-	}
+template<typename T>
+class Pila {
+public:
+    Pila() : top(nullptr), tamanio(0) {}
+    ~Pila() { while (!IsEmpty()) Pop(); }
+
+    void Push(T dato) {
+        Nodo<T>* nuevo = new Nodo<T>(dato);
+        nuevo->siguiente = top;
+        top = nuevo;
+        tamanio++;
+    }
+
+    void Pop() {
+        if (!IsEmpty()) {
+            Nodo<T>* aux = top;
+            top = top->siguiente;
+            delete aux;
+            tamanio--;
+        }
+    }
+
+    bool IsEmpty() { return top == nullptr; }
+
+    int ContarElementosRecursivo(Nodo<T>* actual) {
+        if (actual == nullptr) return 0;
+        return 1 + ContarElementosRecursivo(actual->siguiente);
+    }
+
+    int GetTamanio() { return tamanio; }
+
+    Nodo<T>* GetCima() { return top; }
+
 private:
-	Nodo<T>* top;
+    Nodo<T>* top;
+    int tamanio;
 };

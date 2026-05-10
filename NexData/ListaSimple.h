@@ -13,7 +13,7 @@ public:
 
     void InsertarAlInicio(T_Format dato) {
         if (cabeza != nullptr) {
-            if (dato.Titulo == cabeza->Dato.Titulo) {
+            if (dato == cabeza->Dato) {
                 return;
             }
         }
@@ -30,9 +30,9 @@ public:
 
 	void InsertarEnPosicion(int indx, T_Format dato) {
 		if (cabeza != nullptr) {
-			if (dato.Titulo == cabeza->Dato.Titulo) {
-				return;
-			}
+            if (dato == cabeza->Dato) {
+                return;
+            }
 		}
 
 		Nodo<T_Format>* nuevo = new Nodo<T_Format>(dato);

@@ -2,29 +2,57 @@
 #include <iostream>
 #include <vector>
 using namespace std;
+#include "PeliculaEstadisticas.h"
+#include "PeliculaMetadata.h"
 #include "Complementos.h"
 
 //Lista de datos a guardar de los TXT
 template <typename T_Format>
 class Pelicula {
-public:
-    int Orden;
-    string Titulo;
-    int Lanzamiento;
-    vector<string> Categorias;
-    T_Format Puntuacion;
-    int Volumen;
-    int VistasTotales;
+private:
+    PeliculaMetadata* metadata;
+    PeliculaStats<T_Format>* stats;
 
-    Pelicula(int ord = 0, const string& title = "Sin Titulo", int year = 0,
-        const vector<string>& cat = vector<string>(), T_Format punt = 0,
-        int vol = 0, int visits = 0)
-        : Orden(ord), Titulo(title), Lanzamiento(year), Categorias(cat),
-        Puntuacion(punt), Volumen(vol), VistasTotales(visits) {
+public:
+    Pelicula(int ord = 0, string title = "Sin Titulo", int year = 0,
+        vector<string> cat = {}, T_Format punt = 0, int vol = 0, int visits = 0) {
+        metadata = new PeliculaMetadata(ord, title, year, cat);
+        stats = new PeliculaStats<T_Format>(punt, vol, visits);
     }
 
-    int GetOrden() {
-        return Orden;
+    // Getters de Metadata
+    int GetOrden() const { return metadata->Orden; }
+    string GetTitulo() const { return metadata->Titulo; }
+    int GetLanzamiento() const { return metadata->Lanzamiento; }
+    vector<string> GetCategorias() const { return metadata->Categorias; }
+
+    // Getters de Estadísticas
+    T_Format GetPuntuacion() const { return stats->Puntuacion; }
+    int GetVolumen() const { return stats->Volumen; }
+    int GetVistasTotales() const { return stats->VistasTotales; }
+
+    // Métodos de acceso a objetos completos si son necesarios
+    PeliculaMetadata* GetMetadata() { return metadata; }
+    PeliculaStats<T_Format>* GetEstadisticas() { return stats; }
+
+    // settes para actualizar las estadísticas
+    void SetPuntuacion(T_Format p) { stats->Puntuacion = p; }
+    void SetVolumen(int v) { stats->Volumen = v; }
+    void SetVistasTotales(int vt) { stats->VistasTotales = vt; }
+
+    // Métodos para simplificar la lógica de "ver película" o "calificar"
+    void AumentarVistas() { stats->VistasTotales++; }
+
+    void ActualizarCalificacion(T_Format calif) {
+        double califActual = stats->Puntuacion;
+        int volumenActual = stats->Volumen;
+        double nuevaSuma = (califActual * volumenActual) + calif;
+        stats->Volumen = volumenActual + 1;
+        stats->Puntuacion = nuevaSuma / stats->Volumen;
+    }
+
+    bool operator==(const Pelicula& otra) const {
+        return this->metadata->Titulo == otra.metadata->Titulo;
     }
 
     void MostrarEnLista() {
@@ -35,16 +63,16 @@ public:
             }
             return texto;
             };
-        string tituloLimpio = limpiarTexto(Titulo);
+        string tituloLimpio = limpiarTexto(GetTitulo());
 
 		Console::ForegroundColor = ConsoleColor::DarkYellow;
-        cout << "[" << Orden << "] " << tituloLimpio << " (" << Lanzamiento << ")" << endl;
+        cout << "[" << GetOrden() << "] " << tituloLimpio << " (" << GetLanzamiento() << ")" << endl;
 		Console::ForegroundColor = ConsoleColor::DarkGreen;
 		cout << "Rating: ";
 		Console::ForegroundColor = ConsoleColor::White;
-		cout<< Puntuacion << " | Vistas: " << VistasTotales << endl;
+		cout<< GetPuntuacion() << " | Vistas: " << GetVistasTotales() << endl;
         cout << "Generos: ";
-        for (const auto& c : Categorias) cout << c << " ";
+        for (const auto& c : GetCategorias()) cout << c << " ";
         cout << endl;
     }
 
@@ -64,13 +92,13 @@ public:
             };
 
         int anchoV = GetAnchoVentana();
-        string tituloLimpio = limpiarTexto(Titulo);
+        string tituloLimpio = limpiarTexto(GetTitulo());
 
         GotoxSimplified(0, 0);
         setColor(8); cout << "[ "; setColor(14); cout << "C"; setColor(8); cout << " ] Calificar  ";
         setColor(8); cout << "[ "; setColor(11); cout << "V"; setColor(8); cout << " ] Reproducir  ";
         setColor(8); cout << "[ "; setColor(10); cout << "G"; setColor(8); cout << " ] Guardar  ";
-        setColor(8); cout << "[ "; setColor(12); cout << "S"; setColor(8); cout << " ] Volver";
+        setColor(8); cout << "[ "; setColor(12); cout << "0"; setColor(8); cout << " ] Volver";
         setColor(15);
 
         int posX_Titulo = ((int)anchoV / 2) - ((int)tituloLimpio.length() / 2) - 5;
@@ -84,22 +112,23 @@ public:
 
         setColor(11); GotoxSimplified(5, y + 5); cout << "DETALLES TECNICOS:";
         setColor(15);
-        GotoxSimplified(7, y + 6); cout << char(175) << " LANZAMIENTO: "; setColor(14); cout << Lanzamiento;
+        GotoxSimplified(7, y + 6); cout << char(175) << " LANZAMIENTO: "; setColor(14); cout << GetLanzamiento();
         setColor(15); GotoxSimplified(7, y + 7); cout << char(175) << " CALIFICACION: ";
-        if (Puntuacion > 8) setColor(10); else if (Puntuacion > 5) setColor(14); else setColor(12);
-        cout << Puntuacion << "/10";
+        if (GetPuntuacion() > 8) setColor(10); else if (GetPuntuacion() > 5) setColor(14); else setColor(12);
+        cout << GetPuntuacion() << "/10";
 
         setColor(15); GotoxSimplified(7, y + 8); cout << char(175) << " CATEGORIAS: ";
         setColor(3);
-        for (size_t i = 0; i < Categorias.size(); i++) {
-            cout << Categorias[i] << (i < Categorias.size() - 1 ? " | " : "");
+        vector<string> cats = GetCategorias();
+        for (size_t i = 0; i < cats.size(); i++) {
+            cout << cats[i] << (i < cats.size() - 1 ? " | " : "");
         }
 
         int colDerecha = anchoV / 2 + 10;
         setColor(11); GotoxSimplified(colDerecha, y + 5); cout << "ESTADISTICAS DE COMUNIDAD:";
         setColor(15);
-        GotoxSimplified(colDerecha + 2, y + 6); cout << char(250) << " VISTAS: "; setColor(11); cout << VistasTotales;
-        setColor(15); GotoxSimplified(colDerecha + 2, y + 7); cout << char(250) << " VOTANTES: "; setColor(11); cout << Volumen;
+        GotoxSimplified(colDerecha + 2, y + 6); cout << char(250) << " VISTAS: "; setColor(11); cout << GetVistasTotales();
+        setColor(15); GotoxSimplified(colDerecha + 2, y + 7); cout << char(250) << " VOTANTES: "; setColor(11); cout << GetVolumen();
 
         if (estaGuardada) {
             GotoxSimplified(colDerecha + 2, y + 9);

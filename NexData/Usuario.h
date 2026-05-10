@@ -1,15 +1,18 @@
 #pragma once
 #include "Dependencias.h"
 
-class User
+class Usuario
 {
 public:
-	User(string user, string contra) {
-		usuario = user; contrasena = contra;
+	Usuario(string u = "", string p = "") : usuario(u), contrasena(p) {}
+
+	~Usuario(){}
+	string GetUsuario() { return usuario; }
+	string GetContra() { return contrasena; }
+
+	bool operator==(const Usuario& otro) const {
+		return this->usuario == otro.usuario;
 	}
-	~User(){}
-	string getUser() { return usuario; }
-	string getPass() { return contrasena; }
 
 private:
 	string usuario, contrasena;
