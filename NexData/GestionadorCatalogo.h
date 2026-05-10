@@ -35,10 +35,10 @@ public:
     }
     ~Gestionador() {
     }
+
     void Iniciar() {
         GestionadorArchivos repo;
-        // Cargamos la lista completa primero
-        repo.CargarTodo(Catalogo, TopRecientes); 
+        repo.CargarTodo(Catalogo, TopRecientes);
 
         Nodo<Pelicula<double>>* aux = Catalogo.GetCabeza();
         if (aux != nullptr) {
@@ -51,12 +51,17 @@ public:
 
     void Guardar() {
         GestionadorArchivos repo;
-        repo.CargarHistorial(Catalogo, Pila);
+        repo.GuardarTodo(Catalogo);
     }
 
     void CargarHistorial() {
         GestionadorArchivos repo;
-        repo.GuardarHistorial(Catalogo, Pila);
+        repo.CargarHistorial(Catalogo, Pila);
+    }
+
+    void GuardarPila() {
+        GestionadorArchivos repo;
+        repo.GuardarHistorial(Pila);
     }
 
     void ActualizarTopVistas(Pelicula<double> p) {
@@ -362,7 +367,7 @@ public:
                             aux = aux->siguiente;
                         } while (aux != Catalogo.GetCabeza());
                     }
-                    Guardar();
+                    CargarHistorial();
                     ActualizarTopVistas(peli);
                     curr = curr->siguiente;
                 } while (curr != VerMasTarde.GetCabeza());
@@ -601,7 +606,7 @@ public:
                         } while (curr != VerMasTarde.GetCabeza());
                     }
 
-                    Guardar();
+                    CargarHistorial();
                     ActualizarTopVistas(peli);
                     FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
 
@@ -662,7 +667,7 @@ public:
                     } while (curr != VerMasTarde.GetCabeza());
                 }
 
-                Guardar();
+                CargarHistorial();
                 ActualizarTopVistas(peli);
             }
 

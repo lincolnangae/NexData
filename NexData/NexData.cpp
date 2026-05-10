@@ -138,6 +138,7 @@ bool FaseAutenticacion(ServicioAutenticacion& auth) {
 }
 
 int main() {
+    // 1. Inicialización de Repositorios y Servicios
     UsuarioRepositorio repoUsuarios;
     ServicioAutenticacion auth(&repoUsuarios);
     Gestionador miSistema;
@@ -146,13 +147,18 @@ int main() {
         repoUsuarios.Cargar();
     }
 
+
     if (FaseAutenticacion(auth)) {
+
         miSistema.Iniciar();
+
         miSistema.CargarHistorial();
 
         EjecutarMenu(miSistema);
 
         miSistema.Guardar();
+
+        miSistema.GuardarPila();
     }
 
     return 0;
