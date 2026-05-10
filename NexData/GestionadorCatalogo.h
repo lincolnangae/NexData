@@ -614,7 +614,7 @@ public:
                     Console::ForegroundColor = ConsoleColor::White;
                     Gotoxy(xCentro, 12);
                     cout << "Presione cualquier tecla para continuar...";
-                    _getch();
+                    tecla = _getch();
                 }
 
             else if (tecla == 'V') { // REPRODUCIR
@@ -714,7 +714,7 @@ public:
                 cout << "\n[!] El historial de visualizacion esta vacio." << endl;
                 Console::ForegroundColor = ConsoleColor::White;
                 cout << "\nPresione cualquier tecla para regresar...";
-                _getch();
+                tecla = _getch();
                 return;
             }
 
