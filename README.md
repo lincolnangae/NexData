@@ -1,31 +1,18 @@
-===========================================================
-      PROYECTO NEXTDATA - ESTRUCTURAS DE DATOS AVANZADAS
-===========================================================
+NextData: Sistema de Recomendación y Catálogo
+Sistema interactivo desarrollado en C++ que simula el núcleo lógico de una plataforma de streaming, optimizado mediante estructuras de datos avanzadas y algoritmos de alto rendimiento.
 
-GRUPO: 10
-NRC: 16111
-PROYECTO: Sistema de Recomendación y Catálogo (NextData)
+Integrantes (Grupo 10)
+Lincoln Angel Aranda Eugenio (U20251G186)
 
-INTEGRANTE 1: Lincoln Angel Aranda Eugenio
-- Aporte: Diseño de arquitectura de entidades (PeliculaMetadata, PeliculaStats) 
-  y lógica de programación genérica con Templates.
-- Autovaloración: 20/20
+Victor Aaron Barrientos Villalta (U202515779)
 
-INTEGRANTE 2: Victor Aaron Barrientos Villalta
-- Aporte: Implementación de la persistencia de datos (TXT/BIN), gestión de la 
-  Lista Circular Doble y diseño de la interfaz de usuario en consola.
-- Autovaloración: 20/20
+Sebastian Osvaldo Ortiz Saavedra (U20251G510)
 
-INTEGRANTE 3: Sebastian Osvaldo Ortiz Saavedra
-- Aporte: Desarrollo del motor de ordenamiento QuickSort recursivo con 
-  expresiones Lambda y lógica de filtrado por relevancia social.
-- Autovaloración: 20/20
+Requisitos del Sistema
+Para la correcta compilación y ejecución del proyecto en Visual Studio 2022, es obligatorio tener instalados los siguientes componentes a través de Visual Studio Installer:
 
------------------------------------------------------------
-4. INSTRUCCIONES DE EJECUCIÓN
------------------------------------------------------------
-1. Abrir el archivo NextData.sln en Visual Studio 2026.
-2. Compilar en modo Release/x86 o x64.
-3. Asegurarse de que los archivos DirectorioPeliculas.txt y 
-   DirectorioDatos.txt estén en la carpeta de ejecución.
-===========================================================
+SDK de .NET Framework 4.8.1
+
+Paquete de compatibilidad de .NET Framework 4.8.1
+
+Nota: La omisión de estos componentes generará errores de enlace y compatibilidad en el entorno de desarrollo, especialmente al gestionar las cabeceras de interoperabilidad (msclr).
